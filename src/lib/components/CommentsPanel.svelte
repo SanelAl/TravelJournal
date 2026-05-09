@@ -7,16 +7,20 @@
 
 	<div class="detail-card comments-panel">
 		<div class="comment-list">
-			{#each trip.comments as comment}
-				<article class="comment">
-					<div>
-						<strong>{comment.author}</strong>
-						<span>{comment.date}</span>
-					</div>
-					<p>{comment.text}</p>
-					<button type="button" aria-label={`Kommentar von ${comment.author} loeschen`}>Loeschen</button>
-				</article>
-			{/each}
+			{#if trip.comments.length === 0}
+				<p class="empty-note">Noch keine Kommentare erfasst.</p>
+			{:else}
+				{#each trip.comments as comment}
+					<article class="comment">
+						<div>
+							<strong>{comment.author}</strong>
+							<span>{comment.date}</span>
+						</div>
+						<p>{comment.text}</p>
+						<button type="button" aria-label={`Kommentar von ${comment.author} loeschen`}>Loeschen</button>
+					</article>
+				{/each}
+			{/if}
 		</div>
 
 		<form class="comment-form">
@@ -97,6 +101,16 @@
 		color: #40516d;
 		font-size: 0.9rem;
 		line-height: 1.45;
+	}
+
+	.empty-note {
+		margin: 0;
+		padding: 12px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.72);
+		color: #52617b;
+		font-size: 0.9rem;
+		font-weight: 800;
 	}
 
 	.comment button {

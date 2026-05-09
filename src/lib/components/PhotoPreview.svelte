@@ -1,5 +1,13 @@
 <script>
 	let { trip } = $props();
+
+	const placeholderPhotos = [
+		{ label: 'Foto 1', colors: ['#8aafff', '#ffffff'] },
+		{ label: 'Foto 2', colors: ['#dbe7ff', '#4169be'] },
+		{ label: 'Foto 3', colors: ['#f6bd60', '#355070'] }
+	];
+
+	let visiblePhotos = $derived(trip.photos.length > 0 ? trip.photos.slice(0, 3) : placeholderPhotos);
 </script>
 
 <section class="photo-section" aria-labelledby="photo-title">
@@ -7,11 +15,14 @@
 
 	<div class="detail-card photo-panel">
 		<div class="photo-grid">
-			{#each trip.photos.slice(0, 3) as photo}
+			{#each visiblePhotos as photo}
 				<div
 					class="photo-tile"
 					style={`--photo-start: ${photo.colors[0]}; --photo-end: ${photo.colors[1]};`}
 				>
+					{#if photo.url}
+						<img src={photo.url} alt={photo.label} />
+					{/if}
 					<span>{photo.label}</span>
 				</div>
 			{/each}
@@ -73,6 +84,14 @@
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0)),
 			linear-gradient(135deg, var(--photo-start), var(--photo-end));
+	}
+
+	.photo-tile img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.photo-tile::before,

@@ -1,142 +1,219 @@
 <svelte:head>
-	<title>TravelJournal | Reise bearbeiten</title>
-	<meta name="description" content="Grunddaten einer Reise im TravelJournal Prototyp bearbeiten." />
+	<title>TravelJournal | {data.trip ? `${data.trip.place} ${data.trip.year} bearbeiten` : 'Reise bearbeiten'}</title>
+	<meta name="description" content="Grunddaten einer Reise im TravelJournal bearbeiten." />
 </svelte:head>
 
 <script>
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis'];
 
-	const trips = [
-		{
-			id: 'kyoto-2026',
-			place: 'Kyoto',
-			continent: 'Asien',
-			description: 'Tempel, Streetfood und ruhige Morgen zwischen Bambuswaeldern und Altstadtgassen.',
-			startDate: '12.04.2026',
-			endDate: '20.04.2026',
-			budget: 2000
-		},
-		{
-			id: 'lisbon-2025',
-			place: 'Lissabon',
-			continent: 'Europa',
-			description: 'Aussichtspunkte, Tramfahrten, Pasteis de Nata und ein Tagesausflug ans Meer.',
-			startDate: '03.09.2025',
-			endDate: '08.09.2025',
-			budget: 980
-		},
-		{
-			id: 'reykjavik-2024',
-			place: 'Reykjavik',
-			continent: 'Europa',
-			description: 'Nordlichter, heisse Quellen und lange Fahrten durch eine sehr stille Landschaft.',
-			startDate: '18.02.2024',
-			endDate: '25.02.2024',
-			budget: 2450
-		}
-	];
+	let status = $state('active');
+	let visibility = $state('private');
 
-	function fallbackTrip(id) {
-		return {
-			id,
-			place: 'Unbekannte Reise',
-			continent: '',
-			description: 'Diese Reise ist in den statischen Mock-Daten noch nicht vorhanden.',
-			startDate: '',
-			endDate: '',
-			budget: 0
-		};
-	}
+	let values = $derived(form?.values ?? data.trip ?? {});
+	let title = $derived(data.trip ? `${data.trip.place} ${data.trip.year}` : 'Reise nicht gefunden');
+	let deleteModalId = $derived(data.trip ? `delete-trip-${data.trip.id}` : 'delete-trip');
 
-	let trip = $derived(trips.find((item) => item.id === data.id) ?? fallbackTrip(data.id));
+	$effect(() => {
+		status = values.status ?? 'active';
+		visibility = values.visibility ?? 'private';
+	});
 </script>
 
 <section class="edit-trip-page" aria-labelledby="edit-trip-title">
 	<div class="edit-trip-container container-xxl">
-		<header class="page-header">
-			<div>
-				<p class="eyebrow">Reise bearbeiten</p>
-				<h1 id="edit-trip-title">{trip.place}</h1>
-				<p>
-					Hier pflegst du nur die Grunddaten. Fotos, Aktivitaeten, Kommentare, Notizen und Kosten
-					bearbeitest du direkt auf der Detailseite.
-				</p>
+		{#if data.trip}
+			<header class="page-header">
+				<div>
+					<p class="eyebrow">Reise bearbeiten</p>
+					<h1 id="edit-trip-title">{title}</h1>
+					<p>
+						Hier pflegst du die Grunddaten. Fotos, Aktivitaeten, Kommentare, Notizen und Kosten
+						bearbeitest du direkt auf der Detailseite.
+					</p>
+				</div>
+			</header>
+
+			<form class="trip-form" method="POST" action="?/save">
+				{#if form?.errors?.form}
+					<div class="form-alert" role="alert">{form.errors.form}</div>
+				{/if}
+
+				<div class="form-grid">
+					<label class="field">
+						<span>Ort</span>
+						<input
+							class="form-control"
+							name="place"
+							type="text"
+							value={values.place ?? ''}
+							required
+							aria-invalid={form?.errors?.place ? 'true' : undefined}
+						/>
+						{#if form?.errors?.place}
+							<small>{form.errors.place}</small>
+						{/if}
+					</label>
+
+					<label class="field">
+						<span>Kontinent</span>
+						<select
+							class="form-select"
+							name="continent"
+							required
+							aria-invalid={form?.errors?.continent ? 'true' : undefined}
+						>
+							<option value="">Auswaehlen</option>
+							{#each continents as continent}
+								<option value={continent} selected={values.continent === continent}>{continent}</option>
+							{/each}
+						</select>
+						{#if form?.errors?.continent}
+							<small>{form.errors.continent}</small>
+						{/if}
+					</label>
+
+					<label class="field field-wide">
+						<span>Kurznotiz</span>
+						<textarea class="form-control" name="shortNote" rows="3">{values.shortNote ?? ''}</textarea>
+					</label>
+
+					<label class="field">
+						<span>Datum Beginn</span>
+						<input
+							class="form-control"
+							name="startDate"
+							type="text"
+							inputmode="numeric"
+							value={values.startDate ?? ''}
+							placeholder="dd.mm.yyyy"
+							maxlength="10"
+							required
+							aria-invalid={form?.errors?.startDate ? 'true' : undefined}
+						/>
+						{#if form?.errors?.startDate}
+							<small>{form.errors.startDate}</small>
+						{/if}
+					</label>
+
+					<label class="field">
+						<span>Datum Ende</span>
+						<input
+							class="form-control"
+							name="endDate"
+							type="text"
+							inputmode="numeric"
+							value={values.endDate ?? ''}
+							placeholder="dd.mm.yyyy"
+							maxlength="10"
+							required
+							aria-invalid={form?.errors?.endDate ? 'true' : undefined}
+						/>
+						{#if form?.errors?.endDate}
+							<small>{form.errors.endDate}</small>
+						{/if}
+					</label>
+
+					<div class="field">
+						<span>Status</span>
+						<input type="hidden" name="status" value={status} />
+						<div class="segmented" aria-label="Reisestatus">
+							<button class:active={status === 'active'} type="button" onclick={() => (status = 'active')}>
+								Aktiv
+							</button>
+							<button
+								class:active={status === 'completed'}
+								type="button"
+								onclick={() => (status = 'completed')}
+							>
+								Abgeschlossen
+							</button>
+						</div>
+					</div>
+
+					<div class="field">
+						<span>Sichtbarkeit</span>
+						<input type="hidden" name="visibility" value={visibility} />
+						<div class="segmented" aria-label="Sichtbarkeit">
+							<button class:active={visibility === 'private'} type="button" onclick={() => (visibility = 'private')}>
+								Privat
+							</button>
+							<button class:active={visibility === 'public'} type="button" onclick={() => (visibility = 'public')}>
+								Oeffentlich
+							</button>
+						</div>
+					</div>
+
+					<label class="field">
+						<span>Budget</span>
+						<input
+							class="form-control"
+							name="budget"
+							type="number"
+							min="0"
+							step="0.01"
+							value={values.budget ?? ''}
+							placeholder="0.00"
+							aria-invalid={form?.errors?.budget ? 'true' : undefined}
+						/>
+						{#if form?.errors?.budget}
+							<small>{form.errors.budget}</small>
+						{/if}
+					</label>
+				</div>
+
+				<div class="form-actions">
+					<a class="cancel-link" href={`/trips/${data.trip.id}`}>Abbrechen</a>
+					<button class="submit-link" type="submit">Aenderungen speichern</button>
+				</div>
+			</form>
+
+			<section class="danger-zone" aria-labelledby="danger-title">
+				<div>
+					<p class="eyebrow danger-eyebrow">Gefahrenbereich</p>
+					<h2 id="danger-title">Reise loeschen</h2>
+					<p>Diese Aktion entfernt die Reise mit allen gespeicherten Detaildaten dauerhaft aus MongoDB.</p>
+					{#if form?.errors?.delete}
+						<p class="delete-error" role="alert">{form.errors.delete}</p>
+					{/if}
+				</div>
+
+				<button class="delete-link" type="button" data-bs-toggle="modal" data-bs-target={`#${deleteModalId}`}>
+					Reise loeschen
+				</button>
+			</section>
+
+			<div class="modal fade" id={deleteModalId} tabindex="-1" aria-labelledby={`${deleteModalId}-title`} aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title fs-5" id={`${deleteModalId}-title`}>Reise wirklich loeschen?</h3>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+						</div>
+						<div class="modal-body">
+							<p>
+								{data.trip.place} {data.trip.year} wird dauerhaft geloescht. Diese Aktion kann spaeter
+								nicht rueckgaengig gemacht werden.
+							</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+							<form method="POST" action="?/delete">
+								<button type="submit" class="btn btn-danger">Endgueltig loeschen</button>
+							</form>
+						</div>
+					</div>
+				</div>
 			</div>
-		</header>
-
-		<form class="trip-form">
-			<div class="form-grid">
-				<label class="field">
-					<span>Ort</span>
-					<input class="form-control" name="place" type="text" value={trip.place} required />
-				</label>
-
-				<label class="field">
-					<span>Kontinent</span>
-					<select class="form-select" name="continent" required>
-						<option value="">Auswaehlen</option>
-						{#each continents as continent}
-							<option value={continent} selected={continent === trip.continent}>{continent}</option>
-						{/each}
-					</select>
-				</label>
-
-				<label class="field field-wide">
-					<span>Kurznotiz</span>
-					<textarea class="form-control" name="description" rows="3">{trip.description}</textarea>
-				</label>
-
-				<label class="field">
-					<span>Datum Beginn</span>
-					<input
-						class="form-control"
-						name="startDate"
-						type="text"
-						inputmode="numeric"
-						value={trip.startDate}
-						placeholder="dd.mm.yyyy"
-						pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}"
-						required
-					/>
-				</label>
-
-				<label class="field">
-					<span>Datum Ende</span>
-					<input
-						class="form-control"
-						name="endDate"
-						type="text"
-						inputmode="numeric"
-						value={trip.endDate}
-						placeholder="dd.mm.yyyy"
-						pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}"
-						required
-					/>
-				</label>
-
-				<label class="field">
-					<span>Budget</span>
-					<input class="form-control" name="budget" type="number" min="0" step="0.01" value={trip.budget} />
-				</label>
+		{:else}
+			<div class="not-found-card" role="status">
+				<p class="eyebrow">TravelJournal</p>
+				<h1 id="edit-trip-title">Reise nicht gefunden</h1>
+				<p>{data.errorMessage}</p>
+				<a href="/trips">Zurueck zur Uebersicht</a>
 			</div>
-
-			<div class="form-actions">
-				<a class="cancel-link" href={`/trips/${trip.id}`}>Abbrechen</a>
-				<a class="submit-link" href={`/trips/${trip.id}`}>Aenderungen speichern</a>
-			</div>
-		</form>
-
-		<section class="danger-zone" aria-labelledby="danger-title">
-			<div>
-				<p class="eyebrow danger-eyebrow">Gefahrenbereich</p>
-				<h2 id="danger-title">Reise loeschen</h2>
-				<p>Im Prototyp fuehrt dieser Button nur zurueck zur Uebersicht. Spaeter wird hier die Reise geloescht.</p>
-			</div>
-
-			<a class="delete-link" href="/trips">Reise loeschen</a>
-		</section>
+		{/if}
 	</div>
 </section>
 
@@ -155,7 +232,8 @@
 
 	.page-header,
 	.trip-form,
-	.danger-zone {
+	.danger-zone,
+	.not-found-card {
 		border: 1px solid rgba(255, 255, 255, 0.86);
 		border-radius: 8px;
 		background: rgba(255, 255, 255, 0.76);
@@ -164,7 +242,8 @@
 	}
 
 	.page-header,
-	.danger-zone {
+	.danger-zone,
+	.not-found-card {
 		padding: 22px 24px;
 	}
 
@@ -196,7 +275,8 @@
 	}
 
 	.page-header p:last-child,
-	.danger-zone p:last-child {
+	.danger-zone p:last-child,
+	.not-found-card p:last-child {
 		max-width: 720px;
 		margin: 0;
 		color: #52617b;
@@ -233,10 +313,62 @@
 		font-weight: 700;
 	}
 
+	.field small {
+		margin-top: 6px;
+		color: #b42318;
+		font-size: 0.82rem;
+		font-weight: 800;
+	}
+
+	.form-alert,
+	.delete-error {
+		padding: 12px 14px;
+		border: 1px solid rgba(180, 35, 24, 0.22);
+		border-radius: 8px;
+		background: rgba(180, 35, 24, 0.08);
+		color: #b42318;
+		font-weight: 900;
+	}
+
+	.delete-error {
+		margin: 12px 0 0;
+	}
+
+	.form-control[aria-invalid='true'],
+	.form-select[aria-invalid='true'] {
+		border-color: #b42318;
+	}
+
 	.form-control:focus,
 	.form-select:focus {
 		border-color: #4169be;
 		box-shadow: 0 0 0 0.25rem rgba(138, 175, 255, 0.28);
+	}
+
+	.segmented {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 6px;
+		padding: 4px;
+		border: 1px solid rgba(65, 105, 190, 0.16);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.58);
+	}
+
+	.segmented button {
+		min-height: 38px;
+		border: 0;
+		border-radius: 6px;
+		background: transparent;
+		color: #40516d;
+		font: inherit;
+		font-size: 0.9rem;
+		font-weight: 900;
+	}
+
+	.segmented button.active {
+		background: #14213d;
+		color: #ffffff;
 	}
 
 	.form-actions,
@@ -254,7 +386,8 @@
 
 	.cancel-link,
 	.submit-link,
-	.delete-link {
+	.delete-link,
+	.not-found-card a {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -273,13 +406,29 @@
 	}
 
 	.submit-link {
+		border: 0;
 		background: #14213d;
 		color: #ffffff;
 		box-shadow: 0 12px 28px rgba(20, 33, 61, 0.22);
+		font: inherit;
 	}
 
 	.delete-link {
+		border: 0;
 		background: #b42318;
+		color: #ffffff;
+		font: inherit;
+	}
+
+	.not-found-card {
+		display: grid;
+		justify-items: start;
+		gap: 12px;
+		max-width: 680px;
+	}
+
+	.not-found-card a {
+		background: #14213d;
 		color: #ffffff;
 	}
 
@@ -293,6 +442,13 @@
 		color: #ffffff;
 	}
 
+	:global(.btn-danger) {
+		--bs-btn-bg: #b42318;
+		--bs-btn-border-color: #b42318;
+		--bs-btn-hover-bg: #991b1b;
+		--bs-btn-hover-border-color: #991b1b;
+	}
+
 	@media (max-width: 760px) {
 		.edit-trip-page {
 			padding: 16px;
@@ -300,7 +456,8 @@
 
 		.page-header,
 		.trip-form,
-		.danger-zone {
+		.danger-zone,
+		.not-found-card {
 			padding: 18px;
 		}
 

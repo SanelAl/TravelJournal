@@ -1,21 +1,36 @@
 <script>
 	let { trip } = $props();
 
+	const expenseCategories = [
+		{ category: 'Transport', color: '#4169be' },
+		{ category: 'Unterkunft', color: '#7c3aed' },
+		{ category: 'Verpflegung', color: '#f28f3b' },
+		{ category: 'Aktivitaeten', color: '#2f9c95' },
+		{ category: 'Sonstiges', color: '#e56b6f' }
+	];
+
 	let modalId = $derived(`expense-modal-${trip.id}`);
 	let showCosts = $state(false);
 
 	function formatCurrency(value) {
-		return `CHF ${value.toLocaleString('de-CH')}`;
+		const amount = Number(value ?? 0);
+		return `CHF ${amount.toLocaleString('de-CH')}`;
 	}
 
 	function totalSpent(expenses) {
-		return expenses.reduce((sum, item) => sum + item.amount, 0);
+		return expenses.reduce((sum, item) => sum + Number(item.amount ?? 0), 0);
 	}
 
 	function pieGradient(expenses, budgetTotal) {
+		const total = Number(budgetTotal ?? 0);
+
+		if (total <= 0) {
+			return 'conic-gradient(#d7deea 0% 100%)';
+		}
+
 		let start = 0;
 		const segments = expenses.map((item) => {
-			const size = Math.min((item.amount / budgetTotal) * 100, 100 - start);
+			const size = Math.min((Number(item.amount ?? 0) / total) * 100, 100 - start);
 			const end = start + size;
 			const segment = `${item.color} ${start}% ${end}%`;
 			start = end;
@@ -42,7 +57,7 @@
 			</button>
 
 			<div class="expense-actions" aria-label="Kosten erfassen">
-				{#each trip.expenses as expense}
+				{#each expenseCategories as expense}
 					<button
 						type="button"
 						class="expense-button"
@@ -58,18 +73,22 @@
 
 			{#if showCosts}
 				<div class="cost-overview" aria-label="Erfasste Kosten">
-					{#each trip.expenses as expense}
-						<article class="cost-row" style={`--expense-color: ${expense.color};`}>
-							<div>
-								<span>{expense.category}</span>
-								<strong>{formatCurrency(expense.amount)}</strong>
-							</div>
-							<div class="cost-actions">
-								<button type="button">Bearbeiten</button>
-								<button type="button">Loeschen</button>
-							</div>
-						</article>
-					{/each}
+					{#if trip.expenses.length === 0}
+						<p class="empty-note">Noch keine Kosten erfasst.</p>
+					{:else}
+						{#each trip.expenses as expense}
+							<article class="cost-row" style={`--expense-color: ${expense.color};`}>
+								<div>
+									<span>{expense.category}</span>
+									<strong>{formatCurrency(expense.amount)}</strong>
+								</div>
+								<div class="cost-actions">
+									<button type="button">Bearbeiten</button>
+									<button type="button">Loeschen</button>
+								</div>
+							</article>
+						{/each}
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -95,7 +114,7 @@
 			<div class="modal-body">
 				<label class="form-label" for={`${modalId}-category`}>Kategorie</label>
 				<select class="form-select mb-3" id={`${modalId}-category`}>
-					{#each trip.expenses as expense}
+					{#each expenseCategories as expense}
 						<option>{expense.category}</option>
 					{/each}
 				</select>
@@ -242,6 +261,16 @@
 	.cost-row strong {
 		color: #14213d;
 		font-size: 0.88rem;
+	}
+
+	.empty-note {
+		margin: 0;
+		padding: 9px 10px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.68);
+		color: #52617b;
+		font-size: 0.86rem;
+		font-weight: 800;
 	}
 
 	.cost-actions {

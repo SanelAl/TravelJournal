@@ -23,27 +23,31 @@
 		</div>
 
 		<div class="activity-list">
-			{#each trip.activities as activity}
-				<article class="activity-row">
-					<div class="activity-date">
-						<span>{activity.day}</span>
-						<strong>{activity.month}</strong>
-					</div>
-					<div>
-						<strong>{activity.title}</strong>
-						<span>{activity.time} · {activity.place}</span>
-						<p>{activity.description}</p>
-					</div>
-					<button
-						type="button"
-						data-bs-toggle="modal"
-						data-bs-target={`#${editModalId}`}
-						onclick={() => (selectedActivity = activity)}
-					>
-						Bearbeiten
-					</button>
-				</article>
-			{/each}
+			{#if trip.activities.length === 0}
+				<p class="empty-note">Noch keine Aktivitaeten erfasst.</p>
+			{:else}
+				{#each trip.activities as activity}
+					<article class="activity-row">
+						<div class="activity-date">
+							<span>{activity.day}</span>
+							<strong>{activity.month}</strong>
+						</div>
+						<div>
+							<strong>{activity.title}</strong>
+							<span>{activity.time} - {activity.place}</span>
+							<p>{activity.description}</p>
+						</div>
+						<button
+							type="button"
+							data-bs-toggle="modal"
+							data-bs-target={`#${editModalId}`}
+							onclick={() => (selectedActivity = activity)}
+						>
+							Bearbeiten
+						</button>
+					</article>
+				{/each}
+			{/if}
 		</div>
 	</div>
 </section>
@@ -234,6 +238,16 @@
 		color: #40516d;
 		font-size: 0.88rem;
 		line-height: 1.35;
+	}
+
+	.empty-note {
+		margin: 0;
+		padding: 12px;
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.72);
+		color: #52617b;
+		font-size: 0.9rem;
+		font-weight: 800;
 	}
 
 	:global(.btn-primary) {

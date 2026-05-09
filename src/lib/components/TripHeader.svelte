@@ -1,12 +1,5 @@
 <script>
 	let { trip } = $props();
-	let isActive = $state(false);
-	let isPublic = $state(false);
-
-	$effect(() => {
-		isActive = trip.isActive;
-		isPublic = trip.isPublic;
-	});
 </script>
 
 <header class="trip-header">
@@ -16,13 +9,13 @@
 	</div>
 
 	<div class="header-actions">
-		<button class:active={isActive} class="status-button" type="button" onclick={() => (isActive = !isActive)}>
-			{isActive ? 'Aktiv' : 'Abgeschlossen'}
-		</button>
+		<span class:active={trip.isActive} class="status-badge">
+			{trip.isActive ? 'Aktiv' : 'Abgeschlossen'}
+		</span>
 
-		<button class:active={isPublic} class="status-button" type="button" onclick={() => (isPublic = !isPublic)}>
-			{isPublic ? 'Oeffentlich' : 'Privat'}
-		</button>
+		<span class:active={trip.isPublic} class="status-badge">
+			{trip.isPublic ? 'Oeffentlich' : 'Privat'}
+		</span>
 
 		<a class="edit-link" href={`/trips/${trip.id}/edit`}>Reise bearbeiten</a>
 	</div>
@@ -58,7 +51,7 @@
 		flex: 0 0 auto;
 	}
 
-	.status-button,
+	.status-badge,
 	.edit-link {
 		display: inline-flex;
 		align-items: center;
@@ -75,7 +68,7 @@
 		text-decoration: none;
 	}
 
-	.status-button.active {
+	.status-badge.active {
 		background-color: #4169be;
 		border-color: #4169be;
 		color: #ffffff;
@@ -98,7 +91,7 @@
 			flex-wrap: wrap;
 		}
 
-		.status-button,
+		.status-badge,
 		.edit-link {
 			justify-content: center;
 			flex: 1;

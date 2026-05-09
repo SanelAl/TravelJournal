@@ -4,10 +4,17 @@
 </svelte:head>
 
 <script>
+	let { form } = $props();
+
 	let status = $state('active');
 	let visibility = $state('private');
 
 	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis'];
+
+	$effect(() => {
+		status = form?.values?.status ?? 'active';
+		visibility = form?.values?.visibility ?? 'private';
+	});
 </script>
 
 <section class="new-trip-page" aria-labelledby="new-trip-title">
@@ -20,31 +27,54 @@
 			</div>
 		</header>
 
-		<form class="trip-form">
+		<form class="trip-form" method="POST">
+			{#if form?.errors?.form}
+				<div class="form-alert" role="alert">{form.errors.form}</div>
+			{/if}
+
 			<div class="form-grid">
 				<label class="field">
 					<span>Ort</span>
-					<input class="form-control" name="place" type="text" placeholder="z.B. Kyoto" required />
+					<input
+						class="form-control"
+						name="place"
+						type="text"
+						value={form?.values?.place ?? ''}
+						placeholder="z.B. Kyoto"
+						required
+						aria-invalid={form?.errors?.place ? 'true' : undefined}
+					/>
+					{#if form?.errors?.place}
+						<small>{form.errors.place}</small>
+					{/if}
 				</label>
 
 				<label class="field">
 					<span>Kontinent</span>
-					<select class="form-select" name="continent" required>
+					<select
+						class="form-select"
+						name="continent"
+						required
+						aria-invalid={form?.errors?.continent ? 'true' : undefined}
+					>
 						<option value="">Auswaehlen</option>
 						{#each continents as continent}
-							<option value={continent}>{continent}</option>
+							<option value={continent} selected={form?.values?.continent === continent}>{continent}</option>
 						{/each}
 					</select>
+					{#if form?.errors?.continent}
+						<small>{form.errors.continent}</small>
+					{/if}
 				</label>
 
 				<label class="field field-wide">
 					<span>Kurznotiz</span>
 					<textarea
 						class="form-control"
-						name="description"
+						name="shortNote"
 						rows="3"
 						placeholder="Kurze Beschreibung oder Erinnerung zur Reise"
-					></textarea>
+					>{form?.values?.shortNote ?? ''}</textarea>
 				</label>
 
 				<label class="field">
@@ -54,10 +84,15 @@
 						name="startDate"
 						type="text"
 						inputmode="numeric"
+						value={form?.values?.startDate ?? ''}
 						placeholder="dd.mm.yyyy"
-						pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}"
+						maxlength="10"
 						required
+						aria-invalid={form?.errors?.startDate ? 'true' : undefined}
 					/>
+					{#if form?.errors?.startDate}
+						<small>{form.errors.startDate}</small>
+					{/if}
 				</label>
 
 				<label class="field">
@@ -67,14 +102,20 @@
 						name="endDate"
 						type="text"
 						inputmode="numeric"
+						value={form?.values?.endDate ?? ''}
 						placeholder="dd.mm.yyyy"
-						pattern="[0-9]{2}\.[0-9]{2}\.[0-9]{4}"
+						maxlength="10"
 						required
+						aria-invalid={form?.errors?.endDate ? 'true' : undefined}
 					/>
+					{#if form?.errors?.endDate}
+						<small>{form.errors.endDate}</small>
+					{/if}
 				</label>
 
 				<div class="field">
 					<span>Status</span>
+					<input type="hidden" name="status" value={status} />
 					<div class="segmented" aria-label="Reisestatus">
 						<button
 							class:active={status === 'active'}
@@ -95,6 +136,7 @@
 
 				<div class="field">
 					<span>Sichtbarkeit</span>
+					<input type="hidden" name="visibility" value={visibility} />
 					<div class="segmented" aria-label="Sichtbarkeit">
 						<button
 							class:active={visibility === 'private'}
@@ -115,13 +157,25 @@
 
 				<label class="field">
 					<span>Budget</span>
-					<input class="form-control" name="budget" type="number" min="0" step="0.01" placeholder="0.00" />
+					<input
+						class="form-control"
+						name="budget"
+						type="number"
+						min="0"
+						step="0.01"
+						value={form?.values?.budget ?? ''}
+						placeholder="0.00"
+						aria-invalid={form?.errors?.budget ? 'true' : undefined}
+					/>
+					{#if form?.errors?.budget}
+						<small>{form.errors.budget}</small>
+					{/if}
 				</label>
 			</div>
 
 			<div class="form-actions">
 				<a class="cancel-link" href="/trips">Abbrechen</a>
-				<a class="submit-link" href="/trips">Reise erstellen</a>
+				<button class="submit-link" type="submit">Reise erstellen</button>
 			</div>
 		</form>
 	</div>
@@ -205,6 +259,27 @@
 		font-weight: 700;
 	}
 
+	.field small {
+		margin-top: 6px;
+		color: #b42318;
+		font-size: 0.82rem;
+		font-weight: 800;
+	}
+
+	.form-alert {
+		padding: 12px 14px;
+		border: 1px solid rgba(180, 35, 24, 0.22);
+		border-radius: 8px;
+		background: rgba(180, 35, 24, 0.08);
+		color: #b42318;
+		font-weight: 900;
+	}
+
+	.form-control[aria-invalid='true'],
+	.form-select[aria-invalid='true'] {
+		border-color: #b42318;
+	}
+
 	.form-control:focus,
 	.form-select:focus {
 		border-color: #4169be;
@@ -263,9 +338,11 @@
 	}
 
 	.submit-link {
+		border: 0;
 		background: #14213d;
 		color: #ffffff;
 		box-shadow: 0 12px 28px rgba(20, 33, 61, 0.22);
+		font: inherit;
 	}
 
 	.submit-link:hover {

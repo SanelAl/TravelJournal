@@ -1,6 +1,11 @@
 <svelte:head>
-	<title>TravelJournal | {trip.place} {trip.year}</title>
-	<meta name="description" content={`Detailansicht fuer ${trip.place} ${trip.year} im TravelJournal Prototyp.`} />
+	<title>TravelJournal | {data.trip ? `${data.trip.place} ${data.trip.year}` : 'Reise nicht gefunden'}</title>
+	<meta
+		name="description"
+		content={data.trip
+			? `Detailansicht fuer ${data.trip.place} ${data.trip.year} im TravelJournal.`
+			: 'Reise konnte im TravelJournal nicht gefunden werden.'}
+	/>
 </svelte:head>
 
 <script>
@@ -13,256 +18,39 @@
 	import TripHeader from '$lib/components/TripHeader.svelte';
 
 	let { data } = $props();
-
-	const trips = [
-		{
-			id: 'kyoto-2026',
-			place: 'Kyoto',
-			year: '2026',
-			continent: 'Asien',
-			isActive: true,
-			isPublic: false,
-			description: 'Tempel, Streetfood und ruhige Morgen zwischen Bambuswaeldern und Altstadtgassen.',
-			notes:
-				'Unbedingt morgens frueh starten, weil die Tempel spaeter sehr voll werden. Kleine Restaurants in Gion nochmals recherchieren.',
-			budgetTotal: 2000,
-			photos: [
-				{ label: 'Fushimi Inari', colors: ['#ffc857', '#4169be'] },
-				{ label: 'Bambuswald', colors: ['#8bd17c', '#355070'] },
-				{ label: 'Gion bei Nacht', colors: ['#f38d68', '#2b2d42'] },
-				{ label: 'Tempelgarten', colors: ['#8aafff', '#ffffff'] }
-			],
-			expenses: [
-				{ category: 'Transport', amount: 420, color: '#4169be' },
-				{ category: 'Unterkunft', amount: 650, color: '#7c3aed' },
-				{ category: 'Verpflegung', amount: 280, color: '#f28f3b' },
-				{ category: 'Aktivitaeten', amount: 190, color: '#2f9c95' },
-				{ category: 'Sonstiges', amount: 100, color: '#e56b6f' }
-			],
-			schedule: {
-				departure: '12.04.2026, 10:20 - Hinflug nach Osaka',
-				nextActivity: '18.04.2026, 09:30 - Fushimi Inari',
-				returnFlight: '20.04.2026, 18:45 - Rueckflug nach Zuerich'
-			},
-			activities: [
-				{
-					date: '18.04.2026',
-					day: '18',
-					month: 'Apr',
-					time: '09:30',
-					title: 'Fushimi Inari',
-					place: 'Kyoto',
-					description: 'Frueher Spaziergang durch die roten Torii.'
-				},
-				{
-					date: '18.04.2026',
-					day: '18',
-					month: 'Apr',
-					time: '14:00',
-					title: 'Nishiki Market',
-					place: 'Innenstadt',
-					description: 'Streetfood und kleine Souvenirs.'
-				},
-				{
-					date: '19.04.2026',
-					day: '19',
-					month: 'Apr',
-					time: '10:15',
-					title: 'Bambuswald',
-					place: 'Arashiyama',
-					description: 'Fotos machen und danach Kaffee am Fluss.'
-				}
-			],
-			comments: [
-				{
-					author: 'Du',
-					date: '18.04.2026',
-					text: 'Der fruehe Besuch beim Schrein war die beste Entscheidung der Reise.'
-				},
-				{
-					author: 'Mara',
-					date: '19.04.2026',
-					text: 'Bitte unbedingt noch die kleine Ramen-Bar in der Seitenstrasse notieren.'
-				}
-			]
-		},
-		{
-			id: 'lisbon-2025',
-			place: 'Lissabon',
-			year: '2025',
-			continent: 'Europa',
-			isActive: false,
-			isPublic: true,
-			description: 'Aussichtspunkte, Tramfahrten, Pasteis de Nata und ein Tagesausflug ans Meer.',
-			notes: 'Naechstes Mal eine Unterkunft naeher bei Alfama buchen. Belem war am Vormittag am angenehmsten.',
-			budgetTotal: 980,
-			photos: [
-				{ label: 'Alfama', colors: ['#f28f3b', '#2f9c95'] },
-				{ label: 'Tram 28', colors: ['#ffd166', '#355070'] },
-				{ label: 'Belem', colors: ['#8aafff', '#f8f9fa'] }
-			],
-			expenses: [
-				{ category: 'Transport', amount: 120, color: '#4169be' },
-				{ category: 'Unterkunft', amount: 430, color: '#7c3aed' },
-				{ category: 'Verpflegung', amount: 210, color: '#f28f3b' },
-				{ category: 'Aktivitaeten', amount: 90, color: '#2f9c95' },
-				{ category: 'Sonstiges', amount: 45, color: '#e56b6f' }
-			],
-			schedule: {
-				departure: '03.09.2025, 07:15 - Hinflug nach Lissabon',
-				returnFlight: '08.09.2025, 21:10 - Rueckflug nach Zuerich'
-			},
-			activities: [
-				{
-					date: '04.09.2025',
-					day: '04',
-					month: 'Sep',
-					time: '17:30',
-					title: 'Miradouro da Senhora',
-					place: 'Graca',
-					description: 'Aussichtspunkt fuer Sonnenuntergang.'
-				},
-				{
-					date: '06.09.2025',
-					day: '06',
-					month: 'Sep',
-					time: '11:00',
-					title: 'Belem',
-					place: 'Lissabon',
-					description: 'Kloster, Fluss und Pasteis.'
-				}
-			],
-			comments: [
-				{ author: 'Du', date: '06.09.2025', text: 'Aussicht vom Miradouro kurz vor Sonnenuntergang merken.' },
-				{ author: 'Noah', date: '07.09.2025', text: 'Cascais war perfekt fuer einen ruhigeren Nachmittag.' }
-			]
-		},
-		{
-			id: 'reykjavik-2024',
-			place: 'Reykjavik',
-			year: '2024',
-			continent: 'Europa',
-			isActive: false,
-			isPublic: false,
-			description: 'Nordlichter, heisse Quellen und lange Fahrten durch eine sehr stille Landschaft.',
-			notes: 'Mietwagen war teuer, aber noetig. Wetterfenster fuer Nordlichter besser taeglich pruefen.',
-			budgetTotal: 2450,
-			photos: [
-				{ label: 'Nordlichter', colors: ['#8aafff', '#1f365f'] },
-				{ label: 'Hot Springs', colors: ['#7bdff2', '#355070'] },
-				{ label: 'Roadtrip', colors: ['#f8f9fa', '#3a506b'] }
-			],
-			expenses: [
-				{ category: 'Transport', amount: 620, color: '#4169be' },
-				{ category: 'Unterkunft', amount: 880, color: '#7c3aed' },
-				{ category: 'Verpflegung', amount: 390, color: '#f28f3b' },
-				{ category: 'Aktivitaeten', amount: 310, color: '#2f9c95' },
-				{ category: 'Sonstiges', amount: 85, color: '#e56b6f' }
-			],
-			schedule: {
-				departure: '18.02.2024, 11:40 - Hinflug nach Reykjavik',
-				returnFlight: '25.02.2024, 16:05 - Rueckflug nach Zuerich'
-			},
-			activities: [
-				{
-					date: '20.02.2024',
-					day: '20',
-					month: 'Feb',
-					time: '19:45',
-					title: 'Nordlichter-Tour',
-					place: 'Thingvellir',
-					description: 'War kalt, aber sehr eindruecklich.'
-				},
-				{
-					date: '22.02.2024',
-					day: '22',
-					month: 'Feb',
-					time: '13:00',
-					title: 'Hot Springs',
-					place: 'Reykjadalur',
-					description: 'Badesachen und trockene Socken nicht vergessen.'
-				}
-			],
-			comments: [
-				{ author: 'Du', date: '24.02.2024', text: 'Wetter war wild, aber die Nordlichter waren es komplett wert.' }
-			]
-		}
-	];
-
-	function fallbackTrip(id) {
-		return {
-			id,
-			place: 'Unbekannte Reise',
-			year: '----',
-			continent: 'TravelJournal',
-			isActive: false,
-			isPublic: false,
-			description: 'Diese Reise ist in den statischen Mock-Daten noch nicht vorhanden.',
-			notes: 'Noch keine Notizen erfasst.',
-			budgetTotal: 1000,
-			photos: [
-				{ label: 'Platzhalter', colors: ['#8aafff', '#ffffff'] },
-				{ label: 'Vorschau', colors: ['#dbe7ff', '#4169be'] },
-				{ label: 'Reisebild', colors: ['#f6bd60', '#355070'] }
-			],
-			expenses: [
-				{ category: 'Transport', amount: 0, color: '#4169be' },
-				{ category: 'Unterkunft', amount: 0, color: '#7c3aed' },
-				{ category: 'Verpflegung', amount: 0, color: '#f28f3b' },
-				{ category: 'Aktivitaeten', amount: 0, color: '#2f9c95' },
-				{ category: 'Sonstiges', amount: 0, color: '#e56b6f' }
-			],
-			schedule: {
-				departure: 'Noch nicht erfasst',
-				returnFlight: 'Noch nicht erfasst'
-			},
-			activities: [
-				{
-					date: 'Noch nicht erfasst',
-					day: '--',
-					month: '---',
-					time: '--:--',
-					title: 'Aktivitaet vorbereiten',
-					place: 'Offen',
-					description: 'Hier erscheinen spaeter echte Aktivitaeten.'
-				}
-			],
-			comments: [{ author: 'System', date: 'Heute', text: 'Lege spaeter echte Reisedaten fuer diese ID an.' }]
-		};
-	}
-
-	let foundTrip = $derived(trips.find((item) => item.id === data.id));
-	let trip = $derived(foundTrip ?? fallbackTrip(data.id));
 </script>
 
 <section class="detail-page" aria-labelledby="detail-title">
 	<div class="detail-container container-xxl">
-		<TripHeader {trip} />
+		{#if data.trip}
+			<TripHeader trip={data.trip} />
 
-		{#if !foundTrip}
-			<div class="fallback-note" role="status">
-				Diese Detailseite nutzt gerade Fallback-Daten, weil die Reise-ID noch nicht in den Mock-Daten existiert.
+			<div class="detail-layout">
+				<PhotoPreview trip={data.trip} />
+
+				<div class="journal-block">
+					<NotesPanel trip={data.trip} />
+					<ActivitiesPanel trip={data.trip} />
+				</div>
+
+				<div class="info-block">
+					<div class="left-column">
+						<BudgetPanel trip={data.trip} />
+						<SchedulePanel trip={data.trip} />
+					</div>
+					<div class="right-column">
+						<CommentsPanel trip={data.trip} />
+					</div>
+				</div>
+			</div>
+		{:else}
+			<div class="not-found-card" role="status">
+				<p class="eyebrow">TravelJournal</p>
+				<h1 id="detail-title">Reise nicht gefunden</h1>
+				<p>{data.errorMessage}</p>
+				<a href="/trips">Zurueck zur Uebersicht</a>
 			</div>
 		{/if}
-
-		<div class="detail-layout">
-			<PhotoPreview {trip} />
-
-			<div class="journal-block">
-				<NotesPanel {trip} />
-				<ActivitiesPanel {trip} />
-			</div>
-
-			<div class="info-block">
-				<div class="left-column">
-					<BudgetPanel {trip} />
-					<SchedulePanel {trip} />
-				</div>
-				<div class="right-column">
-					<CommentsPanel {trip} />
-				</div>
-			</div>
-		</div>
 	</div>
 </section>
 
@@ -276,7 +64,7 @@
 
 	.detail-container {
 		display: grid;
-		grid-template-rows: auto auto minmax(0, 1fr);
+		grid-template-rows: auto minmax(0, 1fr);
 		gap: 14px;
 		min-height: 0;
 	}
@@ -285,15 +73,6 @@
 		display: grid;
 		gap: 14px;
 		min-height: 0;
-	}
-
-	.fallback-note {
-		padding: 12px 14px;
-		border: 1px solid rgba(65, 105, 190, 0.18);
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.72);
-		color: #40516d;
-		font-weight: 800;
 	}
 
 	.info-block {
@@ -319,6 +98,52 @@
 
 	.right-column {
 		min-height: 0;
+	}
+
+	.not-found-card {
+		display: grid;
+		justify-items: start;
+		gap: 12px;
+		max-width: 680px;
+		padding: 28px;
+		border: 1px solid rgba(65, 105, 190, 0.16);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.78);
+		box-shadow: 0 14px 38px rgba(51, 87, 158, 0.13);
+	}
+
+	.eyebrow {
+		margin: 0;
+		color: #355aa2;
+		font-size: 0.76rem;
+		font-weight: 900;
+		text-transform: uppercase;
+	}
+
+	h1 {
+		margin: 0;
+		color: #14213d;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1;
+	}
+
+	.not-found-card p:last-of-type {
+		margin: 0;
+		color: #52617b;
+		line-height: 1.55;
+	}
+
+	.not-found-card a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 40px;
+		padding: 0 14px;
+		border-radius: 8px;
+		background: #14213d;
+		color: #ffffff;
+		font-weight: 900;
+		text-decoration: none;
 	}
 
 	@media (max-width: 760px) {

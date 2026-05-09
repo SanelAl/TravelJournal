@@ -1,91 +1,12 @@
 <svelte:head>
 	<title>TravelJournal | Reisen</title>
-	<meta name="description" content="Statische Uebersicht deiner Reisen im TravelJournal Prototyp." />
+	<meta name="description" content="Uebersicht deiner gespeicherten Reisen im TravelJournal." />
 </svelte:head>
 
 <script>
 	import TravelCard from '$lib/components/TravelCard.svelte';
 
-	const trips = [
-		{
-			id: 'kyoto-2026',
-			place: 'Kyoto',
-			year: '2026',
-			date: '12.04.2026 - 20.04.2026',
-			duration: '9 Tage',
-			continent: 'Asien',
-			visibility: 'Privat',
-			budget: 'CHF 2\'000',
-			description: 'Tempel, Streetfood und ruhige Morgen zwischen Bambuswaeldern und Altstadtgassen.',
-			previewLabel: 'Japan',
-			colors: ['#ffc857', '#4169be']
-		},
-		{
-			id: 'lisbon-2025',
-			place: 'Lissabon',
-			year: '2025',
-			date: '03.09.2025 - 08.09.2025',
-			duration: '6 Tage',
-			continent: 'Europa',
-			visibility: 'Oeffentlich',
-			budget: 'CHF 980',
-			description: 'Aussichtspunkte, Tramfahrten, Pasteis de Nata und ein Tagesausflug ans Meer.',
-			previewLabel: 'Portugal',
-			colors: ['#f28f3b', '#2f9c95']
-		},
-		{
-			id: 'reykjavik-2024',
-			place: 'Reykjavik',
-			year: '2024',
-			date: '18.02.2024 - 25.02.2024',
-			duration: '8 Tage',
-			continent: 'Europa',
-			visibility: 'Privat',
-			budget: 'CHF 2\'450',
-			description: 'Nordlichter, heisse Quellen und lange Fahrten durch eine sehr stille Landschaft.',
-			previewLabel: 'Island',
-			colors: ['#8aafff', '#1f365f']
-		},
-		{
-			id: 'marrakesh-2024',
-			place: 'Marrakesch',
-			year: '2024',
-			date: '14.05.2024 - 19.05.2024',
-			duration: '6 Tage',
-			continent: 'Afrika',
-			visibility: 'Oeffentlich',
-			budget: 'CHF 1\'120',
-			description: 'Souks, Dachterrassen, Gewuerze und ein kurzer Abstecher Richtung Atlasgebirge.',
-			previewLabel: 'Marokko',
-			colors: ['#e56b6f', '#355070']
-		},
-		{
-			id: 'vancouver-2023',
-			place: 'Vancouver',
-			year: '2023',
-			date: '02.07.2023 - 16.07.2023',
-			duration: '15 Tage',
-			continent: 'Nordamerika',
-			visibility: 'Privat',
-			budget: 'CHF 3\'300',
-			description: 'Stadt, Kueste, Waldwege und ein sehr voller Speicher mit Landschaftsfotos.',
-			previewLabel: 'Kanada',
-			colors: ['#7bdff2', '#3a506b']
-		},
-		{
-			id: 'cusco-2023',
-			place: 'Cusco',
-			year: '2023',
-			date: '09.10.2023 - 21.10.2023',
-			duration: '13 Tage',
-			continent: 'Suedamerika',
-			visibility: 'Oeffentlich',
-			budget: 'CHF 2\'780',
-			description: 'Hoehenluft, Maerkte, Ruinen und ein Reisetagebuch voller kleiner Beobachtungen.',
-			previewLabel: 'Peru',
-			colors: ['#f6bd60', '#6d597a']
-		}
-	];
+	let { data } = $props();
 </script>
 
 <section class="overview-page" aria-labelledby="overview-title">
@@ -94,40 +15,53 @@
 			<div>
 				<p class="eyebrow">Meine Reisen</p>
 				<h1 id="overview-title">Reiseuebersicht</h1>
-				<p>Alle erfassten Reisen an einem Ort. Fuer den Prototyp sind die Eintraege statisch.</p>
+				<p>Alle gespeicherten Reisen an einem Ort, direkt aus deiner MongoDB Collection.</p>
 			</div>
 
 			<div class="header-actions">
-				<div class="controls" aria-label="Sortierung und Filter">
+				<form class="controls" method="GET" aria-label="Sortierung und Filter">
 					<label>
 						<span>Sortieren</span>
 						<select name="sort">
-							<option>Neueste zuerst</option>
-							<option>Aelteste zuerst</option>
+							<option value="newest" selected={data.filters.sort === 'newest'}>Neueste zuerst</option>
+							<option value="oldest" selected={data.filters.sort === 'oldest'}>Aelteste zuerst</option>
 						</select>
 					</label>
 
 					<label>
 						<span>Kontinent</span>
 						<select name="continent">
-							<option>Alle</option>
-							<option>Europa</option>
-							<option>Asien</option>
-							<option>Afrika</option>
-							<option>Nordamerika</option>
-							<option>Suedamerika</option>
+							<option value="all" selected={data.filters.continent === 'all'}>Alle</option>
+							{#each data.continents as continent}
+								<option value={continent} selected={data.filters.continent === continent}>{continent}</option>
+							{/each}
 						</select>
 					</label>
-				</div>
+
+					<button class="filter-button" type="submit">Anwenden</button>
+				</form>
 
 				<a class="new-trip-link" href="/trips/new">Neue Reise erfassen</a>
 			</div>
 		</header>
 
 		<div class="travel-list" aria-label="Reisen">
-			{#each trips as trip}
-				<TravelCard {trip} />
-			{/each}
+			{#if data.loadError}
+				<div class="empty-state" role="alert">
+					<h2>Keine Verbindung</h2>
+					<p>{data.loadError}</p>
+				</div>
+			{:else if data.trips.length === 0}
+				<div class="empty-state">
+					<h2>Keine Reisen gefunden</h2>
+					<p>Erfasse eine neue Reise oder passe den Kontinent-Filter an.</p>
+					<a href="/trips/new">Neue Reise erfassen</a>
+				</div>
+			{:else}
+				{#each data.trips as trip}
+					<TravelCard {trip} />
+				{/each}
+			{/if}
 		</div>
 	</div>
 </section>
@@ -217,6 +151,21 @@
 		padding: 0 12px;
 	}
 
+	.filter-button {
+		align-self: end;
+		min-height: 40px;
+		padding: 0 14px;
+		border: 1px solid rgba(65, 105, 190, 0.24);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.9);
+		color: #14213d;
+		font-weight: 900;
+	}
+
+	.filter-button:hover {
+		background: rgba(138, 175, 255, 0.18);
+	}
+
 	.new-trip-link {
 		display: inline-flex;
 		align-items: center;
@@ -237,11 +186,50 @@
 
 	.travel-list {
 		display: grid;
+		align-content: start;
+		grid-auto-rows: 172px;
 		gap: 14px;
 		min-height: 0;
 		overflow-y: auto;
 		padding-right: 8px;
 		scrollbar-color: rgba(47, 95, 200, 0.55) rgba(255, 255, 255, 0.45);
+	}
+
+	.empty-state {
+		display: grid;
+		place-items: center;
+		align-content: center;
+		gap: 10px;
+		min-height: 260px;
+		padding: 28px;
+		border: 1px dashed rgba(65, 105, 190, 0.32);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.68);
+		color: #52617b;
+		text-align: center;
+	}
+
+	.empty-state h2 {
+		margin: 0;
+		color: #14213d;
+		font-size: 1.4rem;
+	}
+
+	.empty-state p {
+		margin: 0;
+	}
+
+	.empty-state a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 40px;
+		padding: 0 14px;
+		border-radius: 8px;
+		background: #14213d;
+		color: #ffffff;
+		font-weight: 900;
+		text-decoration: none;
 	}
 
 	.travel-list::-webkit-scrollbar {
