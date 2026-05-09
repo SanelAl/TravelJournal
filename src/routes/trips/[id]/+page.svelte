@@ -4,8 +4,10 @@
 </svelte:head>
 
 <script>
+	import ActivitiesPanel from '$lib/components/ActivitiesPanel.svelte';
 	import BudgetPanel from '$lib/components/BudgetPanel.svelte';
 	import CommentsPanel from '$lib/components/CommentsPanel.svelte';
+	import NotesPanel from '$lib/components/NotesPanel.svelte';
 	import PhotoPreview from '$lib/components/PhotoPreview.svelte';
 	import SchedulePanel from '$lib/components/SchedulePanel.svelte';
 	import TripHeader from '$lib/components/TripHeader.svelte';
@@ -19,7 +21,10 @@
 			year: '2026',
 			continent: 'Asien',
 			isActive: true,
+			isPublic: false,
 			description: 'Tempel, Streetfood und ruhige Morgen zwischen Bambuswaeldern und Altstadtgassen.',
+			notes:
+				'Unbedingt morgens frueh starten, weil die Tempel spaeter sehr voll werden. Kleine Restaurants in Gion nochmals recherchieren.',
 			budgetTotal: 2000,
 			photos: [
 				{ label: 'Fushimi Inari', colors: ['#ffc857', '#4169be'] },
@@ -39,6 +44,35 @@
 				nextActivity: '18.04.2026, 09:30 - Fushimi Inari',
 				returnFlight: '20.04.2026, 18:45 - Rueckflug nach Zuerich'
 			},
+			activities: [
+				{
+					date: '18.04.2026',
+					day: '18',
+					month: 'Apr',
+					time: '09:30',
+					title: 'Fushimi Inari',
+					place: 'Kyoto',
+					description: 'Frueher Spaziergang durch die roten Torii.'
+				},
+				{
+					date: '18.04.2026',
+					day: '18',
+					month: 'Apr',
+					time: '14:00',
+					title: 'Nishiki Market',
+					place: 'Innenstadt',
+					description: 'Streetfood und kleine Souvenirs.'
+				},
+				{
+					date: '19.04.2026',
+					day: '19',
+					month: 'Apr',
+					time: '10:15',
+					title: 'Bambuswald',
+					place: 'Arashiyama',
+					description: 'Fotos machen und danach Kaffee am Fluss.'
+				}
+			],
 			comments: [
 				{
 					author: 'Du',
@@ -58,7 +92,9 @@
 			year: '2025',
 			continent: 'Europa',
 			isActive: false,
+			isPublic: true,
 			description: 'Aussichtspunkte, Tramfahrten, Pasteis de Nata und ein Tagesausflug ans Meer.',
+			notes: 'Naechstes Mal eine Unterkunft naeher bei Alfama buchen. Belem war am Vormittag am angenehmsten.',
 			budgetTotal: 980,
 			photos: [
 				{ label: 'Alfama', colors: ['#f28f3b', '#2f9c95'] },
@@ -76,6 +112,26 @@
 				departure: '03.09.2025, 07:15 - Hinflug nach Lissabon',
 				returnFlight: '08.09.2025, 21:10 - Rueckflug nach Zuerich'
 			},
+			activities: [
+				{
+					date: '04.09.2025',
+					day: '04',
+					month: 'Sep',
+					time: '17:30',
+					title: 'Miradouro da Senhora',
+					place: 'Graca',
+					description: 'Aussichtspunkt fuer Sonnenuntergang.'
+				},
+				{
+					date: '06.09.2025',
+					day: '06',
+					month: 'Sep',
+					time: '11:00',
+					title: 'Belem',
+					place: 'Lissabon',
+					description: 'Kloster, Fluss und Pasteis.'
+				}
+			],
 			comments: [
 				{ author: 'Du', date: '06.09.2025', text: 'Aussicht vom Miradouro kurz vor Sonnenuntergang merken.' },
 				{ author: 'Noah', date: '07.09.2025', text: 'Cascais war perfekt fuer einen ruhigeren Nachmittag.' }
@@ -87,7 +143,9 @@
 			year: '2024',
 			continent: 'Europa',
 			isActive: false,
+			isPublic: false,
 			description: 'Nordlichter, heisse Quellen und lange Fahrten durch eine sehr stille Landschaft.',
+			notes: 'Mietwagen war teuer, aber noetig. Wetterfenster fuer Nordlichter besser taeglich pruefen.',
 			budgetTotal: 2450,
 			photos: [
 				{ label: 'Nordlichter', colors: ['#8aafff', '#1f365f'] },
@@ -105,6 +163,26 @@
 				departure: '18.02.2024, 11:40 - Hinflug nach Reykjavik',
 				returnFlight: '25.02.2024, 16:05 - Rueckflug nach Zuerich'
 			},
+			activities: [
+				{
+					date: '20.02.2024',
+					day: '20',
+					month: 'Feb',
+					time: '19:45',
+					title: 'Nordlichter-Tour',
+					place: 'Thingvellir',
+					description: 'War kalt, aber sehr eindruecklich.'
+				},
+				{
+					date: '22.02.2024',
+					day: '22',
+					month: 'Feb',
+					time: '13:00',
+					title: 'Hot Springs',
+					place: 'Reykjadalur',
+					description: 'Badesachen und trockene Socken nicht vergessen.'
+				}
+			],
 			comments: [
 				{ author: 'Du', date: '24.02.2024', text: 'Wetter war wild, aber die Nordlichter waren es komplett wert.' }
 			]
@@ -118,7 +196,9 @@
 			year: '----',
 			continent: 'TravelJournal',
 			isActive: false,
+			isPublic: false,
 			description: 'Diese Reise ist in den statischen Mock-Daten noch nicht vorhanden.',
+			notes: 'Noch keine Notizen erfasst.',
 			budgetTotal: 1000,
 			photos: [
 				{ label: 'Platzhalter', colors: ['#8aafff', '#ffffff'] },
@@ -136,6 +216,17 @@
 				departure: 'Noch nicht erfasst',
 				returnFlight: 'Noch nicht erfasst'
 			},
+			activities: [
+				{
+					date: 'Noch nicht erfasst',
+					day: '--',
+					month: '---',
+					time: '--:--',
+					title: 'Aktivitaet vorbereiten',
+					place: 'Offen',
+					description: 'Hier erscheinen spaeter echte Aktivitaeten.'
+				}
+			],
 			comments: [{ author: 'System', date: 'Heute', text: 'Lege spaeter echte Reisedaten fuer diese ID an.' }]
 		};
 	}
@@ -157,6 +248,11 @@
 		<div class="detail-layout">
 			<PhotoPreview {trip} />
 
+			<div class="journal-block">
+				<NotesPanel {trip} />
+				<ActivitiesPanel {trip} />
+			</div>
+
 			<div class="info-block">
 				<div class="left-column">
 					<BudgetPanel {trip} />
@@ -174,7 +270,7 @@
 	.detail-page {
 		height: 100%;
 		min-height: 0;
-		overflow: hidden;
+		overflow-y: auto;
 		padding: 18px 28px;
 	}
 
@@ -182,13 +278,11 @@
 		display: grid;
 		grid-template-rows: auto auto minmax(0, 1fr);
 		gap: 14px;
-		height: 100%;
 		min-height: 0;
 	}
 
 	.detail-layout {
 		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
 		gap: 14px;
 		min-height: 0;
 	}
@@ -205,6 +299,13 @@
 	.info-block {
 		display: grid;
 		grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+		gap: 14px;
+		min-height: 0;
+	}
+
+	.journal-block {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 14px;
 		min-height: 0;
 	}
@@ -228,11 +329,13 @@
 
 		.detail-container,
 		.detail-layout,
+		.journal-block,
 		.info-block,
 		.left-column {
 			height: auto;
 		}
 
+		.journal-block,
 		.info-block {
 			grid-template-columns: 1fr;
 		}

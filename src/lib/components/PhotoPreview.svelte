@@ -22,7 +22,7 @@
 					<strong>Fotos hinzufuegen</strong>
 				</button>
 				<a class="photo-action" href={`/trips/${trip.id}/photos`}>
-					<span>↗</span>
+					<span>></span>
 					<strong>Alle Fotos ansehen</strong>
 				</a>
 			</div>

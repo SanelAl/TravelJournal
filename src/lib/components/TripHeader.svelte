@@ -1,9 +1,11 @@
 <script>
 	let { trip } = $props();
 	let isActive = $state(false);
+	let isPublic = $state(false);
 
 	$effect(() => {
 		isActive = trip.isActive;
+		isPublic = trip.isPublic;
 	});
 </script>
 
@@ -16,6 +18,10 @@
 	<div class="header-actions">
 		<button class:active={isActive} class="status-button" type="button" onclick={() => (isActive = !isActive)}>
 			{isActive ? 'Aktiv' : 'Abgeschlossen'}
+		</button>
+
+		<button class:active={isPublic} class="status-button" type="button" onclick={() => (isPublic = !isPublic)}>
+			{isPublic ? 'Oeffentlich' : 'Privat'}
 		</button>
 
 		<a class="edit-link" href={`/trips/${trip.id}/edit`}>Reise bearbeiten</a>
