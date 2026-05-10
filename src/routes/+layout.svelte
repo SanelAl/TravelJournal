@@ -41,7 +41,6 @@
 
 	.route-content {
 		position: relative;
-		z-index: 1;
 		min-height: 100%;
 	}
 </style>
