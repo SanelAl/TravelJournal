@@ -1,8 +1,11 @@
 <script>
 	let { trip } = $props();
+
+	let cardHref = $derived(trip.href ?? `/trips/${trip.id}`);
+	let detailBadge = $derived(trip.ownerName ? `Von ${trip.ownerName}` : trip.visibility);
 </script>
 
-<a class="travel-card" href={`/trips/${trip.id}`} aria-label={`${trip.place} ${trip.year} ansehen`}>
+<a class="travel-card" href={cardHref} aria-label={`${trip.place} ${trip.year} ansehen`}>
 	<div class="card-copy">
 		<div>
 			<p class="eyebrow">{trip.continent}</p>
@@ -14,7 +17,7 @@
 		<div class="detail-row" aria-label="Reisedetails">
 			<span>{trip.date}</span>
 			<span>{trip.duration}</span>
-			<span>{trip.visibility}</span>
+			<span>{detailBadge}</span>
 			<span>{trip.budget}</span>
 		</div>
 	</div>

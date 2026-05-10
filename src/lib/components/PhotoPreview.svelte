@@ -1,5 +1,5 @@
 <script>
-	let { trip, photoError = '' } = $props();
+	let { trip, photoError = '', readonly = false } = $props();
 
 	const placeholderPhotos = [
 		{ label: 'Foto 1', colors: ['#8aafff', '#ffffff'] },
@@ -19,7 +19,7 @@
 			<p class="photo-error" role="alert">{photoError}</p>
 		{/if}
 
-		<div class="photo-grid">
+		<div class="photo-grid" class:readonly>
 			{#each visiblePhotos as photo}
 				<div
 					class="photo-tile"
@@ -32,6 +32,7 @@
 				</div>
 			{/each}
 
+			{#if !readonly}
 			<div class="photo-actions-tile">
 				<button
 					class="photo-action"
@@ -47,10 +48,12 @@
 					<strong>Alle Fotos ansehen</strong>
 				</a>
 			</div>
+			{/if}
 		</div>
 	</div>
 </section>
 
+{#if !readonly}
 <div class="modal fade" id={uploadModalId} tabindex="-1" aria-labelledby={`${uploadModalId}-title`} aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<form class="modal-content" method="POST" action="?/addPhoto" enctype="multipart/form-data">
@@ -90,6 +93,7 @@
 		</form>
 	</div>
 </div>
+{/if}
 
 <style>
 	.photo-section {
@@ -131,6 +135,10 @@
 		display: grid;
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 12px;
+	}
+
+	.photo-grid.readonly {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
 	.photo-tile,

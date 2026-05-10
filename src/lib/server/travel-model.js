@@ -283,6 +283,7 @@ export function mapCommentsForDetail(comments = []) {
 			id: comment._id?.toString?.() ?? `${index}`,
 			date: formatSwissDate(comment.date, 'Noch nicht erfasst'),
 			text: comment.text || comment.note || 'Kein Kommentartext erfasst.',
+			displayName: comment.displayName || '',
 			rawDate: toDate(comment.date)?.toISOString() ?? ''
 		}))
 		.sort((a, b) => b.rawDate.localeCompare(a.rawDate));

@@ -11,6 +11,6 @@ export async function load({ locals, url }) {
 			email: locals.user.email,
 			role: locals.user.role
 		},
-		activeSection: 'trips'
+		activeSection: 'social'
 	};
 }

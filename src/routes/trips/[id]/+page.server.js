@@ -432,11 +432,13 @@ export const actions = {
 				travelQuery(params, locals),
 				{
 					$push: {
-						comments: {
-							_id: new ObjectId(),
-							date: new Date(),
-							text
-						}
+					comments: {
+						_id: new ObjectId(),
+						userId: locals.user.objectId,
+						displayName: locals.user.displayName,
+						date: new Date(),
+						text
+					}
 					},
 					$set: {
 						updatedAt: new Date()

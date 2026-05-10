@@ -1,5 +1,5 @@
 <script>
-	let { trip, expenseError = '' } = $props();
+	let { trip, expenseError = '', readonly = false } = $props();
 
 	const expenseCategories = [
 		{ category: 'Transport', color: '#4169be', icon: 'tram' },
@@ -62,14 +62,16 @@
 				<small>von {formatCurrency(trip.budgetTotal)}</small>
 			</div>
 
-			<div class="budget-actions">
-				<button class="cost-button" type="button" data-bs-toggle="modal" data-bs-target={`#${createModalId}`}>
-					Kosten erfassen
-				</button>
-				<button class="cost-button" type="button" data-bs-toggle="modal" data-bs-target={`#${listModalId}`}>
-					Alle Kosten anzeigen
-				</button>
-			</div>
+			{#if !readonly}
+				<div class="budget-actions">
+					<button class="cost-button" type="button" data-bs-toggle="modal" data-bs-target={`#${createModalId}`}>
+						Kosten erfassen
+					</button>
+					<button class="cost-button" type="button" data-bs-toggle="modal" data-bs-target={`#${listModalId}`}>
+						Alle Kosten anzeigen
+					</button>
+				</div>
+			{/if}
 
 			{#if expenseError}
 				<p class="expense-error" role="alert">{expenseError}</p>
@@ -97,6 +99,7 @@
 	</div>
 </section>
 
+{#if !readonly}
 <div class="modal fade" id={createModalId} tabindex="-1" aria-labelledby={`${createModalId}-title`} aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<form class="modal-content" method="POST" action="?/addExpense">
@@ -225,6 +228,7 @@
 		</form>
 	</div>
 </div>
+{/if}
 
 <style>
 	.budget-section {

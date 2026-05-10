@@ -1,5 +1,5 @@
 <script>
-	let { trip } = $props();
+	let { trip, showEdit = true, ownerName = '', showFollow = false, isFollowing = false } = $props();
 </script>
 
 <header class="trip-header">
@@ -17,7 +17,27 @@
 			{trip.isPublic ? 'Öffentlich' : 'Privat'}
 		</span>
 
-		<a class="edit-link" href={`/trips/${trip.id}/edit`}>Reise bearbeiten</a>
+		{#if ownerName}
+			<span class="status-badge">Von {ownerName}</span>
+		{/if}
+
+		{#if showFollow}
+			<form method="POST" action="?/toggleFollow">
+				<button
+					class:active={isFollowing}
+					class="follow-button"
+					type="submit"
+					aria-label={isFollowing ? `${ownerName} nicht mehr folgen` : `${ownerName} folgen`}
+					title={isFollowing ? 'Nicht mehr folgen' : 'Folgen'}
+				>
+					{isFollowing ? '♥' : '♡'}
+				</button>
+			</form>
+		{/if}
+
+		{#if showEdit}
+			<a class="edit-link" href={`/trips/${trip.id}/edit`}>Reise bearbeiten</a>
+		{/if}
 	</div>
 </header>
 
@@ -51,8 +71,13 @@
 		flex: 0 0 auto;
 	}
 
+	.header-actions form {
+		margin: 0;
+	}
+
 	.status-badge,
-	.edit-link {
+	.edit-link,
+	.follow-button {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -68,10 +93,19 @@
 		text-decoration: none;
 	}
 
-	.status-badge.active {
+	.status-badge.active,
+	.follow-button.active {
 		background-color: #4169be;
 		border-color: #4169be;
 		color: #ffffff;
+	}
+
+	.follow-button {
+		min-width: 42px;
+		padding: 0 12px;
+		cursor: pointer;
+		font-size: 1.2rem;
+		line-height: 1;
 	}
 
 	.edit-link {
@@ -92,7 +126,9 @@
 		}
 
 		.status-badge,
-		.edit-link {
+		.edit-link,
+		.follow-button,
+		form {
 			justify-content: center;
 			flex: 1;
 		}

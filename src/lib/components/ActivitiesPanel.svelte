@@ -1,5 +1,5 @@
 <script>
-	let { trip, activityError = '' } = $props();
+	let { trip, activityError = '', readonly = false } = $props();
 
 	let createModalId = $derived(`activity-create-${trip.id}`);
 	let editModalId = $derived(`activity-edit-${trip.id}`);
@@ -14,9 +14,12 @@
 	<p class="eyebrow" id={`activities-title-${trip.id}`}>Aktivitäten</p>
 
 	<div class="detail-card activities-panel">
+		{#if !readonly}
 		<div class="panel-toolbar">
 			<button type="button" data-bs-toggle="modal" data-bs-target={`#${createModalId}`}>Neue Aktivität</button>
 		</div>
+
+		{/if}
 
 		{#if activityError}
 			<p class="activity-error" role="alert">{activityError}</p>
@@ -37,6 +40,7 @@
 							<span>{activity.date} - {activity.place}</span>
 							<p>{activity.description}</p>
 						</div>
+						{#if !readonly}
 						<button
 							type="button"
 							data-bs-toggle="modal"
@@ -45,6 +49,7 @@
 						>
 							Bearbeiten
 						</button>
+						{/if}
 					</article>
 				{/each}
 			{/if}
@@ -52,6 +57,7 @@
 	</div>
 </section>
 
+{#if !readonly}
 <div class="modal fade" id={createModalId} tabindex="-1" aria-labelledby={`${createModalId}-title`} aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<form class="modal-content" method="POST" action="?/addActivity">
@@ -154,6 +160,8 @@
 		</form>
 	</div>
 </div>
+
+{/if}
 
 <style>
 	.activities-section {

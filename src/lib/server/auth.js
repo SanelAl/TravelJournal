@@ -74,7 +74,8 @@ function publicUser(user) {
 		objectId: user._id,
 		email: user.email,
 		displayName: user.displayName,
-		role: user.role || 'user'
+		role: user.role || 'user',
+		followingUserIds: (user.followingUserIds ?? []).map((id) => (id instanceof ObjectId ? id : new ObjectId(id)))
 	};
 }
 
@@ -106,6 +107,7 @@ export async function ensureAdminUser() {
 		emailNormalized: ADMIN_EMAIL,
 		displayName: 'Admin',
 		role: 'admin',
+		followingUserIds: [],
 		...password,
 		createdAt: now,
 		updatedAt: now
@@ -140,6 +142,7 @@ export async function registerUser({ email, displayName, password }) {
 		emailNormalized,
 		displayName: String(displayName).trim(),
 		role: 'user',
+		followingUserIds: [],
 		...passwordValues,
 		createdAt: now,
 		updatedAt: now

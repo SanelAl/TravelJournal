@@ -1,5 +1,12 @@
 <script>
-	let { trip, commentError = '' } = $props();
+	let {
+		trip,
+		commentError = '',
+		allowAllDeletes = true,
+		allowAdd = true,
+		addAction = '?/addComment',
+		deleteAction = '?/deleteComment'
+	} = $props();
 </script>
 
 <section class="comments-section" aria-labelledby="comments-title">
@@ -13,19 +20,22 @@
 				{#each trip.comments as comment}
 					<article class="comment">
 						<div class="comment-body">
-							<span>{comment.date}</span>
+							<span>{comment.displayName ? `${comment.displayName} - ${comment.date}` : comment.date}</span>
 							<p>{comment.text}</p>
 						</div>
-						<form method="POST" action="?/deleteComment">
+						{#if allowAllDeletes || comment.canDelete}
+						<form method="POST" action={deleteAction}>
 							<input type="hidden" name="commentId" value={comment.id} />
 							<button type="submit" aria-label="Kommentar löschen">Löschen</button>
 						</form>
+						{/if}
 					</article>
 				{/each}
 			{/if}
 		</div>
 
-		<form class="comment-form" method="POST" action="?/addComment">
+		{#if allowAdd}
+		<form class="comment-form" method="POST" action={addAction}>
 			<label for={`comment-${trip.id}`}>Neuer Kommentar</label>
 			<textarea
 				id={`comment-${trip.id}`}
@@ -40,6 +50,7 @@
 			{/if}
 			<button type="submit">Erfassen</button>
 		</form>
+		{/if}
 	</div>
 </section>
 

@@ -53,6 +53,6 @@ export const actions = {
 			});
 		}
 
-		throw redirect(303, next.startsWith('/trips') ? next : '/trips');
+		throw redirect(303, next.startsWith('/trips') || next.startsWith('/social') ? next : '/trips');
 	}
 };

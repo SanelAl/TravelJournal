@@ -1,7 +1,7 @@
 <script>
 	import logo from '$lib/assets/Logo.png';
 
-	let { user = null } = $props();
+	let { user = null, activeSection = 'trips' } = $props();
 </script>
 
 <nav class="app-nav" aria-label="Hauptnavigation">
@@ -11,9 +11,8 @@
 	</a>
 
 	<div class="nav-links">
-		<a class="active" href="/trips">Meine Reisen</a>
-		<a href="/trips">Reise Planen</a>
-		<a href="/trips">Social</a>
+		<a class:active={activeSection === 'trips'} href="/trips">Meine Reisen</a>
+		<a class:active={activeSection === 'social'} href="/social">Social</a>
 		<a href="/trips">Kalender</a>
 	</div>
 
