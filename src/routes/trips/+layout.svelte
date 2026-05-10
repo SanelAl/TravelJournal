@@ -34,12 +34,10 @@
 	.app-shell {
 		display: grid;
 		grid-template-rows: auto minmax(0, 1fr) auto;
-		height: 100dvh;
-		overflow: hidden;
+		min-height: 100dvh;
 	}
 
 	.app-main {
 		min-height: 0;
-		overflow: hidden;
 	}
 </style>

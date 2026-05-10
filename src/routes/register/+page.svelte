@@ -95,7 +95,6 @@
 	:global(html),
 	:global(body) {
 		height: 100%;
-		overflow: hidden;
 	}
 
 	.register-page {

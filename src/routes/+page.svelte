@@ -103,7 +103,6 @@
 	:global(html),
 	:global(body) {
 		height: 100%;
-		overflow: hidden;
 	}
 
 	:global(body) {
@@ -123,7 +122,6 @@
 		min-height: 100dvh;
 		padding: 24px;
 		place-items: center;
-		overflow: hidden;
 	}
 
 	.hero {
@@ -131,7 +129,6 @@
 		grid-template-columns: minmax(0, 1.12fr) minmax(320px, 420px);
 		gap: 28px;
 		width: 100%;
-		max-height: calc(100dvh - 48px);
 		align-items: stretch;
 	}
 
@@ -333,7 +330,6 @@
 
 		.hero {
 			grid-template-columns: 1fr;
-			max-height: calc(100dvh - 32px);
 		}
 
 		.brand-block,
