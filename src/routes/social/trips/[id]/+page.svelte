@@ -31,7 +31,7 @@
 			/>
 
 			<div class="detail-layout">
-				<PhotoPreview trip={data.trip} readonly />
+				<PhotoPreview trip={data.trip} readonly galleryHref={`/social/trips/${data.trip.id}/photos`} />
 
 				<div class="journal-block">
 					<ActivitiesPanel trip={data.trip} readonly />

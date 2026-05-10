@@ -1,5 +1,5 @@
 <script>
-	let { trip, photoError = '', readonly = false } = $props();
+	let { trip, photoError = '', readonly = false, galleryHref = '' } = $props();
 
 	const placeholderPhotos = [
 		{ label: 'Foto 1', colors: ['#8aafff', '#ffffff'] },
@@ -19,7 +19,7 @@
 			<p class="photo-error" role="alert">{photoError}</p>
 		{/if}
 
-		<div class="photo-grid" class:readonly>
+		<div class="photo-grid" class:readonly class:hasGallery={galleryHref}>
 			{#each visiblePhotos as photo}
 				<div
 					class="photo-tile"
@@ -32,8 +32,9 @@
 				</div>
 			{/each}
 
-			{#if !readonly}
-			<div class="photo-actions-tile">
+			{#if !readonly || galleryHref}
+			<div class="photo-actions-tile" class:single={readonly}>
+				{#if !readonly}
 				<button
 					class="photo-action"
 					type="button"
@@ -43,7 +44,8 @@
 					<span>+</span>
 					<strong>Fotos hinzufügen</strong>
 				</button>
-				<a class="photo-action" href={`/trips/${trip.id}/photos`}>
+				{/if}
+				<a class="photo-action" href={galleryHref || `/trips/${trip.id}/photos`}>
 					<span>></span>
 					<strong>Alle Fotos ansehen</strong>
 				</a>
@@ -141,6 +143,10 @@
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
+	.photo-grid.readonly.hasGallery {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
 	.photo-tile,
 	.photo-actions-tile {
 		position: relative;
@@ -195,6 +201,10 @@
 		display: grid;
 		grid-template-rows: 1fr 1fr;
 		gap: 8px;
+	}
+
+	.photo-actions-tile.single {
+		grid-template-rows: 1fr;
 	}
 
 	.photo-action {
