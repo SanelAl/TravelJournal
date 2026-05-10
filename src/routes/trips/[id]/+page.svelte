@@ -26,7 +26,7 @@
 			<TripHeader trip={data.trip} />
 
 			<div class="detail-layout">
-				<PhotoPreview trip={data.trip} />
+				<PhotoPreview trip={data.trip} photoError={form?.errors?.photo} />
 
 				<div class="journal-block">
 					<NotesPanel trip={data.trip} noteError={form?.errors?.notes} noteValue={form?.values?.notes} />

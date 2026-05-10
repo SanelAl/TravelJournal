@@ -1,5 +1,5 @@
 <script>
-	let { trip } = $props();
+	let { trip, photoError = '' } = $props();
 
 	const placeholderPhotos = [
 		{ label: 'Foto 1', colors: ['#8aafff', '#ffffff'] },
@@ -7,28 +7,38 @@
 		{ label: 'Foto 3', colors: ['#f6bd60', '#355070'] }
 	];
 
-	let visiblePhotos = $derived(trip.photos.length > 0 ? trip.photos.slice(0, 3) : placeholderPhotos);
+	let uploadModalId = $derived(`photo-upload-${trip.id}`);
+	let visiblePhotos = $derived([...trip.photos.slice(0, 3), ...placeholderPhotos].slice(0, 3));
 </script>
 
 <section class="photo-section" aria-labelledby="photo-title">
 	<p class="eyebrow" id="photo-title">Fotos</p>
 
 	<div class="detail-card photo-panel">
+		{#if photoError}
+			<p class="photo-error" role="alert">{photoError}</p>
+		{/if}
+
 		<div class="photo-grid">
 			{#each visiblePhotos as photo}
 				<div
 					class="photo-tile"
+					class:hasImage={photo.url}
 					style={`--photo-start: ${photo.colors[0]}; --photo-end: ${photo.colors[1]};`}
 				>
 					{#if photo.url}
 						<img src={photo.url} alt={photo.label} />
 					{/if}
-					<span>{photo.label}</span>
 				</div>
 			{/each}
 
 			<div class="photo-actions-tile">
-				<button class="photo-action" type="button">
+				<button
+					class="photo-action"
+					type="button"
+					data-bs-toggle="modal"
+					data-bs-target={`#${uploadModalId}`}
+				>
 					<span>+</span>
 					<strong>Fotos hinzufügen</strong>
 				</button>
@@ -40,6 +50,46 @@
 		</div>
 	</div>
 </section>
+
+<div class="modal fade" id={uploadModalId} tabindex="-1" aria-labelledby={`${uploadModalId}-title`} aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<form class="modal-content" method="POST" action="?/addPhoto" enctype="multipart/form-data">
+			<div class="modal-header">
+				<h2 class="modal-title fs-5" id={`${uploadModalId}-title`}>Foto hinzufügen</h2>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label class="form-label" for={`${uploadModalId}-name`}>Name</label>
+					<input
+						class="form-control"
+						id={`${uploadModalId}-name`}
+						name="photoName"
+						type="text"
+						placeholder="z.B. Sonnenuntergang am See"
+					/>
+					<div class="form-text">Bei mehreren Bildern wird automatisch der jeweilige Dateiname verwendet.</div>
+				</div>
+				<div>
+					<label class="form-label" for={`${uploadModalId}-file`}>Bilddateien</label>
+					<input
+						class="form-control"
+						id={`${uploadModalId}-file`}
+						name="photoFile"
+						type="file"
+						accept="image/*"
+						multiple
+						required
+					/>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+				<button type="submit" class="btn btn-primary">Foto speichern</button>
+			</div>
+		</form>
+	</div>
+</div>
 
 <style>
 	.photo-section {
@@ -56,6 +106,17 @@
 
 	.photo-panel {
 		padding: 14px;
+	}
+
+	.photo-error {
+		margin: 0 0 10px;
+		padding: 10px 12px;
+		border: 1px solid rgba(220, 53, 69, 0.28);
+		border-radius: 8px;
+		background: rgba(220, 53, 69, 0.08);
+		color: #8a1f2d;
+		font-size: 0.86rem;
+		font-weight: 800;
 	}
 
 	.eyebrow {
@@ -89,6 +150,7 @@
 	.photo-tile img {
 		position: absolute;
 		inset: 0;
+		z-index: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
@@ -102,10 +164,16 @@
 		content: '';
 	}
 
+	.photo-tile.hasImage::before,
+	.photo-tile.hasImage::after {
+		display: none;
+	}
+
 	.photo-tile::before {
 		bottom: 38px;
 		height: 90px;
-		background: linear-gradient(135deg, transparent 0 20%, rgba(20, 33, 61, 0.44) 20% 56%, transparent 56%),
+		background:
+			linear-gradient(135deg, transparent 0 20%, rgba(20, 33, 61, 0.44) 20% 56%, transparent 56%),
 			linear-gradient(225deg, transparent 0 22%, rgba(20, 33, 61, 0.32) 22% 64%, transparent 64%);
 	}
 
@@ -113,19 +181,6 @@
 		bottom: 0;
 		height: 58px;
 		background: rgba(255, 255, 255, 0.28);
-	}
-
-	.photo-tile span {
-		position: absolute;
-		right: 14px;
-		bottom: 14px;
-		z-index: 1;
-		padding: 7px 10px;
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.86);
-		color: #14213d;
-		font-size: 0.8rem;
-		font-weight: 900;
 	}
 
 	.photo-actions-tile {

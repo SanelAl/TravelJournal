@@ -1,4 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { uploadImageBuffer } from '$lib/server/cloudinary.js';
 import { getTravelsCollection } from '$lib/server/db.js';
 import { ObjectId } from 'mongodb';
 
@@ -152,6 +153,15 @@ function getSchedule(travel, activities) {
 
 function readString(formData, key) {
 	return String(formData.get(key) ?? '').trim();
+}
+
+function safePublicId(value) {
+	return value
+		.toLowerCase()
+		.replace(/\.[^.]+$/, '')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/(^-|-$)/g, '')
+		.slice(0, 48);
 }
 
 function activityValuesFrom(formData) {
@@ -614,6 +624,80 @@ export const actions = {
 			console.error('Failed to add comment:', error);
 			return fail(500, {
 				errors: { comment: 'Der Kommentar konnte nicht gespeichert werden. Bitte versuche es erneut.' }
+			});
+		}
+
+		throw redirect(303, `/trips/${params.id}`);
+	},
+
+	addPhoto: async ({ params, request }) => {
+		if (!ObjectId.isValid(params.id)) {
+			return fail(400, {
+				errors: { photo: 'Diese Reise-ID ist ungültig.' }
+			});
+		}
+
+		const formData = await request.formData();
+		const photoName = readString(formData, 'photoName');
+		const photoFiles = formData
+			.getAll('photoFile')
+			.filter((photoFile) => photoFile instanceof File && photoFile.size > 0);
+
+		if (photoFiles.length === 0) {
+			return fail(400, {
+				errors: { photo: 'Bitte mindestens ein Bild auswählen.' }
+			});
+		}
+
+		if (photoFiles.some((photoFile) => !photoFile.type.startsWith('image/'))) {
+			return fail(400, {
+				errors: { photo: 'Bitte nur gültige Bilddateien auswählen.' }
+			});
+		}
+
+		const folder = `traveljournal/trips/${params.id}`;
+		const hasMultiplePhotos = photoFiles.length > 1;
+
+		try {
+			const photoDocs = await Promise.all(
+				photoFiles.map(async (photoFile) => {
+					const photoId = new ObjectId();
+					const imageName = hasMultiplePhotos ? photoFile.name : photoName || photoFile.name || 'Reisefoto';
+					const publicId = `${safePublicId(imageName) || 'foto'}-${photoId.toString()}`;
+					const buffer = Buffer.from(await photoFile.arrayBuffer());
+					const uploadResult = await uploadImageBuffer(buffer, { folder, publicId });
+
+					return {
+						_id: photoId,
+						name: imageName,
+						date: new Date(),
+						url: uploadResult.secure_url,
+						publicId: uploadResult.public_id
+					};
+				})
+			);
+			const collection = await getTravelsCollection();
+			const result = await collection.updateOne(
+				{ _id: new ObjectId(params.id) },
+				{
+					$push: {
+						photos: { $each: photoDocs }
+					},
+					$set: {
+						updatedAt: new Date()
+					}
+				}
+			);
+
+			if (result.matchedCount === 0) {
+				return fail(404, {
+					errors: { photo: 'Diese Reise wurde nicht gefunden.' }
+				});
+			}
+		} catch (error) {
+			console.error('Failed to upload photo:', error);
+			return fail(500, {
+				errors: { photo: 'Das Foto konnte nicht hochgeladen werden. Bitte versuche es erneut.' }
 			});
 		}
 

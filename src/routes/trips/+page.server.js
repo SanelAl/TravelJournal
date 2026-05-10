@@ -61,10 +61,21 @@ function formatBudget(amount) {
 	return `CHF ${budget.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
 }
 
+function getRandomPreviewPhoto(photos = []) {
+	const validPhotos = photos.filter((photo) => photo?.url);
+
+	if (validPhotos.length === 0) {
+		return null;
+	}
+
+	return validPhotos[Math.floor(Math.random() * validPhotos.length)];
+}
+
 function mapTravelToCard(travel) {
 	const startDate = travel.startDate instanceof Date ? travel.startDate : new Date(travel.startDate);
 	const endDate = travel.endDate instanceof Date ? travel.endDate : new Date(travel.endDate);
 	const continent = travel.continent || 'Europa';
+	const previewPhoto = getRandomPreviewPhoto(travel.photos ?? []);
 
 	return {
 		id: travel._id.toString(),
@@ -77,6 +88,8 @@ function mapTravelToCard(travel) {
 		budget: formatBudget(travel.budgetTotal),
 		description: travel.shortNote || 'Noch keine Kurznotiz erfasst.',
 		previewLabel: continent,
+		previewUrl: previewPhoto?.url || '',
+		previewAlt: previewPhoto?.name || `${travel.place || 'Reise'} Foto`,
 		colors: CONTINENT_COLORS[continent] ?? ['#8aafff', '#4169be']
 	};
 }

@@ -19,11 +19,19 @@
 		</div>
 	</div>
 
-	<div class="preview" style={`--preview-start: ${trip.colors[0]}; --preview-end: ${trip.colors[1]};`}>
-		<div class="preview-sun"></div>
-		<div class="preview-shape shape-one"></div>
-		<div class="preview-shape shape-two"></div>
-		<span>{trip.previewLabel}</span>
+	<div
+		class="preview"
+		class:hasImage={trip.previewUrl}
+		style={`--preview-start: ${trip.colors[0]}; --preview-end: ${trip.colors[1]};`}
+	>
+		{#if trip.previewUrl}
+			<img src={trip.previewUrl} alt={trip.previewAlt} />
+		{:else}
+			<div class="preview-sun"></div>
+			<div class="preview-shape shape-one"></div>
+			<div class="preview-shape shape-two"></div>
+			<span>{trip.previewLabel}</span>
+		{/if}
 	</div>
 </a>
 
@@ -56,9 +64,10 @@
 	.card-copy {
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
-		gap: 16px;
+		justify-content: start;
+		gap: 10px;
 		min-width: 0;
+		min-height: 0;
 	}
 
 	.eyebrow {
@@ -80,13 +89,18 @@
 		margin: 0;
 		color: #52617b;
 		font-size: 0.95rem;
-		line-height: 1.55;
+		line-height: 1.35;
+		display: -webkit-box;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 	}
 
 	.detail-row {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		margin-top: auto;
 	}
 
 	.detail-row span {
@@ -105,6 +119,13 @@
 		overflow: hidden;
 		border-radius: 8px;
 		background: linear-gradient(135deg, var(--preview-start), var(--preview-end));
+	}
+
+	.preview img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
 	.preview-sun {
