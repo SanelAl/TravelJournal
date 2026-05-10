@@ -2,7 +2,7 @@
 	<title>TravelJournal | Login</title>
 	<meta
 		name="description"
-		content="TravelJournal ist dein persoenliches Reisetagebuch fuer Orte, Erlebnisse, Fotos, Kommentare und Budgets."
+		content="TravelJournal ist dein persönliches Reisetagebuch für Orte, Erlebnisse, Fotos, Kommentare und Budgets."
 	/>
 </svelte:head>
 
@@ -11,16 +11,16 @@
 
 	const highlights = [
 		{
-			title: 'Reisen ueberblicken',
-			text: 'Sortiere deine Eintraege spaeter nach Datum, Kontinent und Sichtbarkeit.'
+			title: 'Reisen überblicken',
+			text: 'Sortiere deine Einträge später nach Datum, Kontinent und Sichtbarkeit.'
 		},
 		{
 			title: 'Details pflegen',
-			text: 'Aktivitaeten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
+			text: 'Aktivitäten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
 		},
 		{
 			title: 'Reisen erfassen',
-			text: 'Abgeschlossene Reisen werden Schritt fuer Schritt dokumentiert.'
+			text: 'Abgeschlossene Reisen werden Schritt für Schritt dokumentiert.'
 		}
 	];
 
@@ -32,11 +32,11 @@
 		<div class="brand-block">
 			<div class="hero-copy">
 				<img class="hero-logo" src={logo} alt="TravelJournal" />
-				<p class="eyebrow">Persoenliches Reisetagebuch</p>
+				<p class="eyebrow">Persönliches Reisetagebuch</p>
 				<h1 id="page-title">TravelJournal</h1>
 				<p>
-					Sammle Reiseorte, Daten, Aktivitaeten, Fotos, Kommentare und Budgets in einer
-					uebersichtlichen Web-App mit SvelteKit und MongoDB.
+					Sammle Reiseorte, Daten, Aktivitäten, Fotos, Kommentare und Budgets in einer
+					übersichtlichen Web-App mit SvelteKit und MongoDB.
 				</p>
 			</div>
 
@@ -53,7 +53,7 @@
 		<div class="login-panel" aria-labelledby="login-title">
 			<div>
 				<p class="panel-kicker">Einloggen</p>
-				<h2 id="login-title">Willkommen zurueck</h2>
+				<h2 id="login-title">Willkommen zurück</h2>
 			</div>
 
 			<form>
@@ -100,7 +100,7 @@
 
 			<div class="quadrants" aria-label="Detailseiten-Quadranten">
 				<section>
-					<h3>Aktivitaeten</h3>
+					<h3>Aktivitäten</h3>
 					<ul>
 						{#each mockActivities as activity}
 							<li>{activity}</li>
@@ -120,7 +120,7 @@
 
 				<section>
 					<h3>Kommentare</h3>
-					<p>Der Tempelbesuch am Morgen war ruhig, spaeter kam Regen.</p>
+					<p>Der Tempelbesuch am Morgen war ruhig, später kam Regen.</p>
 				</section>
 
 				<section>

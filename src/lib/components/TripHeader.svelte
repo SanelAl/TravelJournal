@@ -14,7 +14,7 @@
 		</span>
 
 		<span class:active={trip.isPublic} class="status-badge">
-			{trip.isPublic ? 'Oeffentlich' : 'Privat'}
+			{trip.isPublic ? 'Öffentlich' : 'Privat'}
 		</span>
 
 		<a class="edit-link" href={`/trips/${trip.id}/edit`}>Reise bearbeiten</a>

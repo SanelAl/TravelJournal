@@ -3,7 +3,7 @@
 	<meta
 		name="description"
 		content={data.trip
-			? `Detailansicht fuer ${data.trip.place} ${data.trip.year} im TravelJournal.`
+			? `Detailansicht für ${data.trip.place} ${data.trip.year} im TravelJournal.`
 			: 'Reise konnte im TravelJournal nicht gefunden werden.'}
 	/>
 </svelte:head>
@@ -17,7 +17,7 @@
 	import SchedulePanel from '$lib/components/SchedulePanel.svelte';
 	import TripHeader from '$lib/components/TripHeader.svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 </script>
 
 <section class="detail-page" aria-labelledby="detail-title">
@@ -29,17 +29,17 @@
 				<PhotoPreview trip={data.trip} />
 
 				<div class="journal-block">
-					<NotesPanel trip={data.trip} />
-					<ActivitiesPanel trip={data.trip} />
+					<NotesPanel trip={data.trip} noteError={form?.errors?.notes} noteValue={form?.values?.notes} />
+					<ActivitiesPanel trip={data.trip} activityError={form?.errors?.activity} />
 				</div>
 
 				<div class="info-block">
 					<div class="left-column">
-						<BudgetPanel trip={data.trip} />
+						<BudgetPanel trip={data.trip} expenseError={form?.errors?.expense} />
 						<SchedulePanel trip={data.trip} />
 					</div>
 					<div class="right-column">
-						<CommentsPanel trip={data.trip} />
+						<CommentsPanel trip={data.trip} commentError={form?.errors?.comment} />
 					</div>
 				</div>
 			</div>
@@ -48,7 +48,7 @@
 				<p class="eyebrow">TravelJournal</p>
 				<h1 id="detail-title">Reise nicht gefunden</h1>
 				<p>{data.errorMessage}</p>
-				<a href="/trips">Zurueck zur Uebersicht</a>
+				<a href="/trips">Zurück zur Übersicht</a>
 			</div>
 		{/if}
 	</div>
@@ -79,11 +79,13 @@
 		display: grid;
 		grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
 		gap: 14px;
+		align-items: stretch;
 		min-height: 0;
 	}
 
 	.journal-block {
 		display: grid;
+		align-items: stretch;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 14px;
 		min-height: 0;
@@ -97,6 +99,7 @@
 	}
 
 	.right-column {
+		display: grid;
 		min-height: 0;
 	}
 

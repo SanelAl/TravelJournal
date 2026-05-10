@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { getTravelsCollection } from '$lib/server/db.js';
 
-const CONTINENTS = new Set(['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis']);
+const CONTINENTS = new Set(['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Südamerika', 'Ozeanien', 'Antarktis']);
 
 function readString(formData, key) {
 	return String(formData.get(key) ?? '').trim();
@@ -52,7 +52,7 @@ export const actions = {
 		}
 
 		if (!CONTINENTS.has(values.continent)) {
-			errors.continent = 'Bitte Kontinent auswaehlen.';
+			errors.continent = 'Bitte Kontinent auswählen.';
 		}
 
 		const startDate = parseSwissDate(values.startDate);
@@ -73,15 +73,15 @@ export const actions = {
 		const budgetTotal = values.budget ? Number(values.budget) : 0;
 
 		if (!Number.isFinite(budgetTotal) || budgetTotal < 0) {
-			errors.budget = 'Bitte ein gueltiges Budget erfassen.';
+			errors.budget = 'Bitte ein gültiges Budget erfassen.';
 		}
 
 		if (!['active', 'completed'].includes(values.status)) {
-			errors.status = 'Ungueltiger Status.';
+			errors.status = 'Ungültiger Status.';
 		}
 
 		if (!['private', 'public'].includes(values.visibility)) {
-			errors.visibility = 'Ungueltige Sichtbarkeit.';
+			errors.visibility = 'Ungültige Sichtbarkeit.';
 		}
 
 		if (Object.keys(errors).length > 0) {

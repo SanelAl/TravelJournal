@@ -10,7 +10,7 @@ const CONTINENT_COLORS = {
 	Antarktis: ['#d7efff', '#5d789c']
 };
 
-const CONTINENTS = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis'];
+const CONTINENTS = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Südamerika', 'Ozeanien', 'Antarktis'];
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
 function normalizeSort(value) {
@@ -73,7 +73,7 @@ function mapTravelToCard(travel) {
 		date: `${formatDate(startDate)} - ${formatDate(endDate)}`,
 		duration: getDuration(startDate, endDate),
 		continent,
-		visibility: travel.isPublic ? 'Oeffentlich' : 'Privat',
+		visibility: travel.isPublic ? 'Öffentlich' : 'Privat',
 		budget: formatBudget(travel.budgetTotal),
 		description: travel.shortNote || 'Noch keine Kurznotiz erfasst.',
 		previewLabel: continent,

@@ -6,7 +6,7 @@
 <script>
 	let { data, form } = $props();
 
-	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis'];
+	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Südamerika', 'Ozeanien', 'Antarktis'];
 
 	let status = $state('active');
 	let visibility = $state('private');
@@ -29,7 +29,7 @@
 					<p class="eyebrow">Reise bearbeiten</p>
 					<h1 id="edit-trip-title">{title}</h1>
 					<p>
-						Hier pflegst du die Grunddaten. Fotos, Aktivitaeten, Kommentare, Notizen und Kosten
+						Hier pflegst du die Grunddaten. Fotos, Aktivitäten, Kommentare, Notizen und Kosten
 						bearbeitest du direkt auf der Detailseite.
 					</p>
 				</div>
@@ -64,7 +64,7 @@
 							required
 							aria-invalid={form?.errors?.continent ? 'true' : undefined}
 						>
-							<option value="">Auswaehlen</option>
+							<option value="">Auswählen</option>
 							{#each continents as continent}
 								<option value={continent} selected={values.continent === continent}>{continent}</option>
 							{/each}
@@ -140,7 +140,7 @@
 								Privat
 							</button>
 							<button class:active={visibility === 'public'} type="button" onclick={() => (visibility = 'public')}>
-								Oeffentlich
+								Öffentlich
 							</button>
 						</div>
 					</div>
@@ -165,14 +165,14 @@
 
 				<div class="form-actions">
 					<a class="cancel-link" href={`/trips/${data.trip.id}`}>Abbrechen</a>
-					<button class="submit-link" type="submit">Aenderungen speichern</button>
+					<button class="submit-link" type="submit">Änderungen speichern</button>
 				</div>
 			</form>
 
 			<section class="danger-zone" aria-labelledby="danger-title">
 				<div>
 					<p class="eyebrow danger-eyebrow">Gefahrenbereich</p>
-					<h2 id="danger-title">Reise loeschen</h2>
+					<h2 id="danger-title">Reise löschen</h2>
 					<p>Diese Aktion entfernt die Reise mit allen gespeicherten Detaildaten dauerhaft aus MongoDB.</p>
 					{#if form?.errors?.delete}
 						<p class="delete-error" role="alert">{form.errors.delete}</p>
@@ -180,7 +180,7 @@
 				</div>
 
 				<button class="delete-link" type="button" data-bs-toggle="modal" data-bs-target={`#${deleteModalId}`}>
-					Reise loeschen
+					Reise löschen
 				</button>
 			</section>
 
@@ -188,19 +188,19 @@
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h3 class="modal-title fs-5" id={`${deleteModalId}-title`}>Reise wirklich loeschen?</h3>
+							<h3 class="modal-title fs-5" id={`${deleteModalId}-title`}>Reise wirklich löschen?</h3>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
 						</div>
 						<div class="modal-body">
 							<p>
-								{data.trip.place} {data.trip.year} wird dauerhaft geloescht. Diese Aktion kann spaeter
-								nicht rueckgaengig gemacht werden.
+								{data.trip.place} {data.trip.year} wird dauerhaft gelöscht. Diese Aktion kann später
+								nicht rückgängig gemacht werden.
 							</p>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
 							<form method="POST" action="?/delete">
-								<button type="submit" class="btn btn-danger">Endgueltig loeschen</button>
+								<button type="submit" class="btn btn-danger">Endgültig löschen</button>
 							</form>
 						</div>
 					</div>
@@ -211,7 +211,7 @@
 				<p class="eyebrow">TravelJournal</p>
 				<h1 id="edit-trip-title">Reise nicht gefunden</h1>
 				<p>{data.errorMessage}</p>
-				<a href="/trips">Zurueck zur Uebersicht</a>
+				<a href="/trips">Zurück zur Übersicht</a>
 			</div>
 		{/if}
 	</div>

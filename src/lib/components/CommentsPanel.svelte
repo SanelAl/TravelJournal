@@ -1,5 +1,5 @@
 <script>
-	let { trip } = $props();
+	let { trip, commentError = '' } = $props();
 </script>
 
 <section class="comments-section" aria-labelledby="comments-title">
@@ -12,21 +12,33 @@
 			{:else}
 				{#each trip.comments as comment}
 					<article class="comment">
-						<div>
-							<strong>{comment.author}</strong>
+						<div class="comment-body">
 							<span>{comment.date}</span>
+							<p>{comment.text}</p>
 						</div>
-						<p>{comment.text}</p>
-						<button type="button" aria-label={`Kommentar von ${comment.author} loeschen`}>Loeschen</button>
+						<form method="POST" action="?/deleteComment">
+							<input type="hidden" name="commentId" value={comment.id} />
+							<button type="submit" aria-label="Kommentar löschen">Löschen</button>
+						</form>
 					</article>
 				{/each}
 			{/if}
 		</div>
 
-		<form class="comment-form">
+		<form class="comment-form" method="POST" action="?/addComment">
 			<label for={`comment-${trip.id}`}>Neuer Kommentar</label>
-			<textarea id={`comment-${trip.id}`} class="form-control" rows="2" placeholder="Kommentar schreiben"></textarea>
-			<button type="button">Kommentar erfassen</button>
+			<textarea
+				id={`comment-${trip.id}`}
+				class="form-control"
+				name="commentText"
+				rows="2"
+				placeholder="Kommentar schreiben"
+				aria-invalid={commentError ? 'true' : undefined}
+			></textarea>
+			{#if commentError}
+				<p class="comment-error" role="alert">{commentError}</p>
+			{/if}
+			<button type="submit">Erfassen</button>
 		</form>
 	</div>
 </section>
@@ -34,6 +46,7 @@
 <style>
 	.comments-section {
 		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
 		gap: 6px;
 		height: 100%;
 		min-height: 0;
@@ -48,7 +61,7 @@
 
 	.comments-panel {
 		display: grid;
-		grid-template-rows: auto minmax(0, 1fr) auto;
+		grid-template-rows: minmax(0, 1fr) auto;
 		gap: 8px;
 		height: 100%;
 		min-height: 0;
@@ -74,18 +87,18 @@
 
 	.comment {
 		display: grid;
-		gap: 5px;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: start;
+		gap: 8px;
 		padding: 8px 10px;
-		border: 0;
 		border-radius: 8px;
 		background: rgba(255, 255, 255, 0.72);
 	}
 
-	.comment div {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 12px;
+	.comment-body {
+		display: grid;
+		gap: 3px;
+		min-width: 0;
 	}
 
 	.comment span,
@@ -99,8 +112,8 @@
 	.comment p {
 		margin: 0;
 		color: #40516d;
-		font-size: 0.9rem;
-		line-height: 1.45;
+		font-size: 0.88rem;
+		line-height: 1.35;
 	}
 
 	.empty-note {
@@ -114,51 +127,77 @@
 	}
 
 	.comment button {
-		justify-self: start;
-		min-height: 28px;
+		min-height: 26px;
 		padding: 0 8px;
 		border: 1px solid rgba(180, 35, 24, 0.2);
 		border-radius: 8px;
 		background: rgba(180, 35, 24, 0.08);
 		color: #b42318;
 		font: inherit;
-		font-size: 0.76rem;
+		font-size: 0.74rem;
 		font-weight: 900;
 	}
 
 	.comment-form {
 		display: grid;
-		gap: 6px;
-		padding-top: 4px;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 6px 8px;
+		padding-top: 8px;
 		border-top: 1px solid rgba(65, 105, 190, 0.12);
 	}
 
+	.comment-form label,
+	.comment-form textarea,
+	.comment-error {
+		grid-column: 1 / -1;
+	}
+
 	.comment-form textarea {
-		min-height: 62px;
-		font-size: 0.9rem;
+		min-height: 48px;
+		font-size: 0.88rem;
+		resize: vertical;
+	}
+
+	.comment-form textarea[aria-invalid='true'] {
+		border-color: #b42318;
+	}
+
+	.comment-error {
+		margin: 0;
+		padding: 8px 10px;
+		border: 1px solid rgba(180, 35, 24, 0.22);
+		border-radius: 8px;
+		background: rgba(180, 35, 24, 0.08);
+		color: #b42318;
+		font-size: 0.8rem;
+		font-weight: 900;
 	}
 
 	.comment-form button {
+		grid-column: 2;
 		justify-self: end;
-		min-height: 34px;
-		padding: 0 12px;
+		min-height: 30px;
+		padding: 0 10px;
 		border: 0;
 		border-radius: 8px;
 		background: #14213d;
 		color: #ffffff;
 		font: inherit;
-		font-size: 0.86rem;
+		font-size: 0.8rem;
 		font-weight: 900;
 	}
 
 	@media (max-width: 700px) {
-		.comment div {
-			align-items: flex-start;
-			flex-direction: column;
-			gap: 2px;
+		.comment {
+			grid-template-columns: 1fr;
+		}
+
+		.comment-form {
+			grid-template-columns: 1fr;
 		}
 
 		.comment-form button {
+			grid-column: 1;
 			width: 100%;
 		}
 	}

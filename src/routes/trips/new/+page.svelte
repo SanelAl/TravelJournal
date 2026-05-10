@@ -1,6 +1,6 @@
 <svelte:head>
 	<title>TravelJournal | Neue Reise</title>
-	<meta name="description" content="Grunddaten fuer eine neue Reise im TravelJournal Prototyp erfassen." />
+	<meta name="description" content="Grunddaten für eine neue Reise im TravelJournal Prototyp erfassen." />
 </svelte:head>
 
 <script>
@@ -9,7 +9,7 @@
 	let status = $state('active');
 	let visibility = $state('private');
 
-	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis'];
+	const continents = ['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Südamerika', 'Ozeanien', 'Antarktis'];
 
 	$effect(() => {
 		status = form?.values?.status ?? 'active';
@@ -22,8 +22,8 @@
 		<header class="page-header">
 			<div>
 				<p class="eyebrow">Neue Reise</p>
-				<h1 id="new-trip-title">Reise-Grundgeruest erfassen</h1>
-				<p>Lege zuerst die Basisdaten an. Fotos, Aktivitaeten, Notizen und Kosten folgen spaeter auf der Detailseite.</p>
+				<h1 id="new-trip-title">Reise-Grundgerüst erfassen</h1>
+				<p>Lege zuerst die Basisdaten an. Fotos, Aktivitäten, Notizen und Kosten folgen später auf der Detailseite.</p>
 			</div>
 		</header>
 
@@ -57,7 +57,7 @@
 						required
 						aria-invalid={form?.errors?.continent ? 'true' : undefined}
 					>
-						<option value="">Auswaehlen</option>
+						<option value="">Auswählen</option>
 						{#each continents as continent}
 							<option value={continent} selected={form?.values?.continent === continent}>{continent}</option>
 						{/each}
@@ -150,7 +150,7 @@
 							type="button"
 							onclick={() => (visibility = 'public')}
 						>
-							Oeffentlich
+							Öffentlich
 						</button>
 					</div>
 				</div>

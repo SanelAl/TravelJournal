@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { getTravelsCollection } from '$lib/server/db.js';
 import { ObjectId } from 'mongodb';
 
-const CONTINENTS = new Set(['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Suedamerika', 'Ozeanien', 'Antarktis']);
+const CONTINENTS = new Set(['Europa', 'Asien', 'Afrika', 'Nordamerika', 'Südamerika', 'Ozeanien', 'Antarktis']);
 
 function readString(formData, key) {
 	return String(formData.get(key) ?? '').trim();
@@ -74,7 +74,7 @@ function validateValues(values) {
 	}
 
 	if (!CONTINENTS.has(values.continent)) {
-		errors.continent = 'Bitte Kontinent auswaehlen.';
+		errors.continent = 'Bitte Kontinent auswählen.';
 	}
 
 	const startDate = parseSwissDate(values.startDate);
@@ -95,15 +95,15 @@ function validateValues(values) {
 	const budgetTotal = values.budget ? Number(values.budget) : 0;
 
 	if (!Number.isFinite(budgetTotal) || budgetTotal < 0) {
-		errors.budget = 'Bitte ein gueltiges Budget erfassen.';
+		errors.budget = 'Bitte ein gültiges Budget erfassen.';
 	}
 
 	if (!['active', 'completed'].includes(values.status)) {
-		errors.status = 'Ungueltiger Status.';
+		errors.status = 'Ungültiger Status.';
 	}
 
 	if (!['private', 'public'].includes(values.visibility)) {
-		errors.visibility = 'Ungueltige Sichtbarkeit.';
+		errors.visibility = 'Ungültige Sichtbarkeit.';
 	}
 
 	return {
@@ -139,7 +139,7 @@ export async function load({ params }) {
 	if (!objectId) {
 		return {
 			trip: null,
-			errorMessage: 'Diese Reise-ID ist ungueltig.'
+			errorMessage: 'Diese Reise-ID ist ungültig.'
 		};
 	}
 
@@ -174,7 +174,7 @@ export const actions = {
 
 		if (!objectId) {
 			return fail(400, {
-				errors: { form: 'Diese Reise-ID ist ungueltig.' },
+				errors: { form: 'Diese Reise-ID ist ungültig.' },
 				values: {}
 			});
 		}
@@ -236,7 +236,7 @@ export const actions = {
 		} catch (error) {
 			console.error('Failed to delete travel:', error);
 			return fail(500, {
-				errors: { delete: 'Die Reise konnte nicht geloescht werden. Bitte versuche es erneut.' }
+				errors: { delete: 'Die Reise konnte nicht gelöscht werden. Bitte versuche es erneut.' }
 			});
 		}
 

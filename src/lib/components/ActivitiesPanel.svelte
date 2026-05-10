@@ -1,5 +1,5 @@
 <script>
-	let { trip } = $props();
+	let { trip, activityError = '' } = $props();
 
 	let createModalId = $derived(`activity-create-${trip.id}`);
 	let editModalId = $derived(`activity-edit-${trip.id}`);
@@ -11,20 +11,20 @@
 </script>
 
 <section class="activities-section" aria-labelledby={`activities-title-${trip.id}`}>
-	<div class="section-heading">
-		<p class="eyebrow" id={`activities-title-${trip.id}`}>Aktivitaeten</p>
-		<button type="button" data-bs-toggle="modal" data-bs-target={`#${createModalId}`}>Neue Aktivitaet</button>
-	</div>
+	<p class="eyebrow" id={`activities-title-${trip.id}`}>Aktivitäten</p>
 
 	<div class="detail-card activities-panel">
-		<div class="filter-row" aria-label="Aktivitaeten nach Datum filtern">
-			<label for={`activity-date-${trip.id}`}>Datum</label>
-			<input id={`activity-date-${trip.id}`} class="form-control" type="date" />
+		<div class="panel-toolbar">
+			<button type="button" data-bs-toggle="modal" data-bs-target={`#${createModalId}`}>Neue Aktivität</button>
 		</div>
+
+		{#if activityError}
+			<p class="activity-error" role="alert">{activityError}</p>
+		{/if}
 
 		<div class="activity-list">
 			{#if trip.activities.length === 0}
-				<p class="empty-note">Noch keine Aktivitaeten erfasst.</p>
+				<p class="empty-note">Noch keine Aktivitäten erfasst.</p>
 			{:else}
 				{#each trip.activities as activity}
 					<article class="activity-row">
@@ -34,7 +34,7 @@
 						</div>
 						<div>
 							<strong>{activity.title}</strong>
-							<span>{activity.time} - {activity.place}</span>
+							<span>{activity.date} - {activity.place}</span>
 							<p>{activity.description}</p>
 						</div>
 						<button
@@ -54,79 +54,121 @@
 
 <div class="modal fade" id={createModalId} tabindex="-1" aria-labelledby={`${createModalId}-title`} aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
+		<form class="modal-content" method="POST" action="?/addActivity">
 			<div class="modal-header">
-				<h3 class="modal-title fs-5" id={`${createModalId}-title`}>Neue Aktivitaet</h3>
+				<h3 class="modal-title fs-5" id={`${createModalId}-title`}>Neue Aktivität</h3>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
 			</div>
 			<div class="modal-body">
 				<label class="form-label" for={`${createModalId}-date`}>Datum</label>
-				<input class="form-control mb-3" id={`${createModalId}-date`} type="date" />
-
-				<label class="form-label" for={`${createModalId}-time`}>Zeit</label>
-				<input class="form-control mb-3" id={`${createModalId}-time`} type="time" />
+				<input
+					class="form-control mb-3"
+					id={`${createModalId}-date`}
+					name="activityDate"
+					type="text"
+					placeholder="dd.mm.yyyy"
+					maxlength="10"
+					required
+				/>
 
 				<label class="form-label" for={`${createModalId}-title-input`}>Titel</label>
-				<input class="form-control mb-3" id={`${createModalId}-title-input`} type="text" placeholder="Aktivitaet" />
+				<input
+					class="form-control mb-3"
+					id={`${createModalId}-title-input`}
+					name="activityTitle"
+					type="text"
+					placeholder="Aktivität"
+					required
+				/>
 
 				<label class="form-label" for={`${createModalId}-place`}>Ort</label>
-				<input class="form-control mb-3" id={`${createModalId}-place`} type="text" placeholder="Ort" />
+				<input class="form-control mb-3" id={`${createModalId}-place`} name="activityPlace" type="text" placeholder="Ort" required />
 
 				<label class="form-label" for={`${createModalId}-note`}>Notiz</label>
-				<textarea class="form-control" id={`${createModalId}-note`} rows="3" placeholder="Kurze Beschreibung"></textarea>
+				<textarea
+					class="form-control"
+					id={`${createModalId}-note`}
+					name="activityNote"
+					rows="3"
+					placeholder="Kurze Beschreibung"
+				></textarea>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
-				<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aktivitaet hinzufuegen</button>
+				<button type="submit" class="btn btn-primary">Aktivität hinzufügen</button>
 			</div>
-		</div>
+		</form>
 	</div>
 </div>
 
 <div class="modal fade" id={editModalId} tabindex="-1" aria-labelledby={`${editModalId}-title`} aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
+		<form class="modal-content" method="POST" action="?/updateActivity">
+			<input type="hidden" name="activityId" value={selectedActivity?.id ?? ''} />
+
 			<div class="modal-header">
-				<h3 class="modal-title fs-5" id={`${editModalId}-title`}>Aktivitaet bearbeiten</h3>
+				<h3 class="modal-title fs-5" id={`${editModalId}-title`}>Aktivität bearbeiten</h3>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schliessen"></button>
 			</div>
 			<div class="modal-body">
 				<label class="form-label" for={`${editModalId}-date`}>Datum</label>
-				<input class="form-control mb-3" id={`${editModalId}-date`} type="text" value={selectedActivity?.date ?? ''} />
-
-				<label class="form-label" for={`${editModalId}-time`}>Zeit</label>
-				<input class="form-control mb-3" id={`${editModalId}-time`} type="text" value={selectedActivity?.time ?? ''} />
+				<input
+					class="form-control mb-3"
+					id={`${editModalId}-date`}
+					name="activityDate"
+					type="text"
+					value={selectedActivity?.date ?? ''}
+					placeholder="dd.mm.yyyy"
+					maxlength="10"
+					required
+				/>
 
 				<label class="form-label" for={`${editModalId}-title-input`}>Titel</label>
-				<input class="form-control mb-3" id={`${editModalId}-title-input`} type="text" value={selectedActivity?.title ?? ''} />
+				<input
+					class="form-control mb-3"
+					id={`${editModalId}-title-input`}
+					name="activityTitle"
+					type="text"
+					value={selectedActivity?.title ?? ''}
+					required
+				/>
 
 				<label class="form-label" for={`${editModalId}-place`}>Ort</label>
-				<input class="form-control mb-3" id={`${editModalId}-place`} type="text" value={selectedActivity?.place ?? ''} />
+				<input
+					class="form-control mb-3"
+					id={`${editModalId}-place`}
+					name="activityPlace"
+					type="text"
+					value={selectedActivity?.place ?? ''}
+					required
+				/>
 
 				<label class="form-label" for={`${editModalId}-note`}>Notiz</label>
-				<textarea class="form-control" id={`${editModalId}-note`} rows="3" value={selectedActivity?.description ?? ''}></textarea>
+				<textarea class="form-control" id={`${editModalId}-note`} name="activityNote" rows="3" value={selectedActivity?.description ?? ''}></textarea>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Aktivitaet loeschen</button>
+				<button type="submit" class="btn btn-outline-danger" formaction="?/deleteActivity">Aktivität löschen</button>
 				<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
-				<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Speichern</button>
+				<button type="submit" class="btn btn-primary">Speichern</button>
 			</div>
-		</div>
+		</form>
 	</div>
 </div>
 
 <style>
 	.activities-section {
 		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
 		gap: 6px;
+		height: 100%;
 		min-height: 0;
 	}
 
-	.section-heading {
+	.panel-toolbar {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: 12px;
+		justify-content: flex-end;
+		min-height: 34px;
 	}
 
 	.eyebrow {
@@ -137,7 +179,7 @@
 		text-transform: uppercase;
 	}
 
-	.section-heading button,
+	.panel-toolbar button,
 	.activity-row button {
 		min-height: 32px;
 		padding: 0 10px;
@@ -159,25 +201,22 @@
 
 	.activities-panel {
 		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
+		grid-template-rows: auto auto minmax(0, 1fr);
 		gap: 10px;
 		height: 100%;
 		min-height: 0;
 		padding: 12px;
 	}
 
-	.filter-row {
-		display: grid;
-		grid-template-columns: auto minmax(160px, 220px);
-		align-items: center;
-		gap: 10px;
-	}
-
-	.filter-row label {
-		color: #52617b;
-		font-size: 0.72rem;
+	.activity-error {
+		margin: 0;
+		padding: 9px 10px;
+		border: 1px solid rgba(180, 35, 24, 0.22);
+		border-radius: 8px;
+		background: rgba(180, 35, 24, 0.08);
+		color: #b42318;
+		font-size: 0.84rem;
 		font-weight: 900;
-		text-transform: uppercase;
 	}
 
 	.activity-list {
@@ -258,7 +297,6 @@
 	}
 
 	@media (max-width: 760px) {
-		.filter-row,
 		.activity-row {
 			grid-template-columns: 1fr;
 		}

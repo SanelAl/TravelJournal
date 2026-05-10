@@ -3,7 +3,7 @@
 </script>
 
 <nav class="app-nav" aria-label="Hauptnavigation">
-	<a class="brand" href="/trips" aria-label="TravelJournal Uebersicht">
+	<a class="brand" href="/trips" aria-label="TravelJournal Übersicht">
 		<img class="brand-logo" src={logo} alt="" aria-hidden="true" />
 		<span>TravelJournal</span>
 	</a>

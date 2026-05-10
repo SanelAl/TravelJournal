@@ -7,27 +7,19 @@
 
 	<div class="detail-card schedule-panel">
 		<div class="schedule-lines">
-			{#if trip.isActive}
-				<div>
-					<span>Naechste Aktivitaet</span>
-					<strong>{trip.schedule.nextActivity}</strong>
-				</div>
-			{:else}
-				<div>
-					<span>Hinflug</span>
-					<strong>{trip.schedule.departure}</strong>
-				</div>
-			{/if}
+			<div>
+				<span>{trip.schedule.firstLabel}</span>
+				<strong>{trip.schedule.firstValue}</strong>
+			</div>
 
 			<div>
-				<span>Rueckflug</span>
-				<strong>{trip.schedule.returnFlight}</strong>
+				<span>Rückreise</span>
+				<strong>{trip.schedule.returnValue}</strong>
 			</div>
 		</div>
 
 		<div class="schedule-actions">
 			<a href="/trips">Zum Kalender</a>
-			<button type="button">+ Aktivitaet hinzufuegen</button>
 		</div>
 	</div>
 </section>
@@ -109,17 +101,6 @@
 		flex: 0 0 auto;
 	}
 
-	button {
-		min-height: 40px;
-		padding: 0 14px;
-		border: 0;
-		border-radius: 8px;
-		background: #14213d;
-		color: #ffffff;
-		font: inherit;
-		font-weight: 900;
-	}
-
 	@media (max-width: 640px) {
 		.schedule-panel {
 			grid-template-columns: 1fr;
@@ -135,8 +116,5 @@
 			justify-items: stretch;
 		}
 
-		button {
-			width: 100%;
-		}
 	}
 </style>

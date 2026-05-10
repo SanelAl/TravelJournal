@@ -1,6 +1,6 @@
 <svelte:head>
 	<title>TravelJournal | Reisen</title>
-	<meta name="description" content="Uebersicht deiner gespeicherten Reisen im TravelJournal." />
+	<meta name="description" content="Übersicht deiner gespeicherten Reisen im TravelJournal." />
 </svelte:head>
 
 <script>
@@ -14,7 +14,7 @@
 		<header class="overview-header">
 			<div>
 				<p class="eyebrow">Meine Reisen</p>
-				<h1 id="overview-title">Reiseuebersicht</h1>
+				<h1 id="overview-title">Reiseübersicht</h1>
 				<p>Alle gespeicherten Reisen an einem Ort, direkt aus deiner MongoDB Collection.</p>
 			</div>
 
@@ -24,7 +24,7 @@
 						<span>Sortieren</span>
 						<select name="sort">
 							<option value="newest" selected={data.filters.sort === 'newest'}>Neueste zuerst</option>
-							<option value="oldest" selected={data.filters.sort === 'oldest'}>Aelteste zuerst</option>
+							<option value="oldest" selected={data.filters.sort === 'oldest'}>Älteste zuerst</option>
 						</select>
 					</label>
 

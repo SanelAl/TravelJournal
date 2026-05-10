@@ -30,7 +30,7 @@
 			<div class="photo-actions-tile">
 				<button class="photo-action" type="button">
 					<span>+</span>
-					<strong>Fotos hinzufuegen</strong>
+					<strong>Fotos hinzufügen</strong>
 				</button>
 				<a class="photo-action" href={`/trips/${trip.id}/photos`}>
 					<span>></span>
