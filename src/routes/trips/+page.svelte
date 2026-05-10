@@ -1,6 +1,6 @@
 <svelte:head>
-	<title>TravelJournal | Reisen</title>
-	<meta name="description" content="Übersicht deiner gespeicherten Reisen im TravelJournal." />
+	<title>TravelJournal | Meine Reisen</title>
+	<meta name="description" content="Uebersicht deiner gespeicherten Reisen im TravelJournal." />
 </svelte:head>
 
 <script>
@@ -14,8 +14,8 @@
 		<header class="overview-header">
 			<div>
 				<p class="eyebrow">Meine Reisen</p>
-				<h1 id="overview-title">Reiseübersicht</h1>
-				<p>Alle gespeicherten Reisen an einem Ort, direkt aus deiner MongoDB Collection.</p>
+				<h1 id="overview-title">Meine Reisen</h1>
+				<p>Alle Reisen, die zu deinem Konto gehoeren, an einem Ort.</p>
 			</div>
 
 			<div class="header-actions">

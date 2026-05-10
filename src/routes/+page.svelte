@@ -2,25 +2,27 @@
 	<title>TravelJournal | Login</title>
 	<meta
 		name="description"
-		content="TravelJournal ist dein persoenliches Reisetagebuch fuer Orte, Erlebnisse, Fotos, Kommentare und Budgets."
+		content="TravelJournal ist dein persönliches Reisetagebuch für Orte, Erlebnisse, Fotos, Kommentare und Budgets."
 	/>
 </svelte:head>
 
 <script>
 	import logo from '$lib/assets/Logo.png';
 
+	let { form } = $props();
+
 	const highlights = [
 		{
-			title: 'Reisen ueberblicken',
-			text: 'Sortiere deine Eintraege spaeter nach Datum, Kontinent und Sichtbarkeit.'
+			title: 'Reisen überblicken',
+			text: 'Sortiere deine Einträge später nach Datum, Kontinent und Sichtbarkeit.'
 		},
 		{
 			title: 'Details pflegen',
-			text: 'Aktivitaeten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
+			text: 'Aktivitäten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
 		},
 		{
 			title: 'Reisen erfassen',
-			text: 'Abgeschlossene Reisen werden Schritt fuer Schritt dokumentiert.'
+			text: 'Abgeschlossene Reisen werden Schritt für Schritt dokumentiert.'
 		}
 	];
 </script>
@@ -30,11 +32,11 @@
 		<div class="brand-block">
 			<div class="hero-copy">
 				<img class="hero-logo" src={logo} alt="TravelJournal" />
-				<p class="eyebrow">Persoenliches Reisetagebuch</p>
+				<p class="eyebrow">Persönliches Reisetagebuch</p>
 				<h1 id="page-title">TravelJournal</h1>
 				<p>
-					Sammle Reiseorte, Daten, Aktivitaeten, Fotos, Kommentare und Budgets in einer
-					uebersichtlichen Web-App mit SvelteKit und MongoDB.
+					Sammle Reiseorte, Daten, Aktivitäten, Fotos, Kommentare und Budgets in einer
+					übersichtlichen Web-App mit SvelteKit und MongoDB.
 				</p>
 			</div>
 
@@ -51,25 +53,47 @@
 		<div class="login-panel" aria-labelledby="login-title">
 			<div>
 				<p class="panel-kicker">Einloggen</p>
-				<h2 id="login-title">Willkommen zurueck</h2>
+				<h2 id="login-title">Willkommen zurück</h2>
 			</div>
 
-			<form>
+			<form method="POST">
+				{#if form?.errors?.form}
+					<div class="form-alert" role="alert">{form.errors.form}</div>
+				{/if}
 				<label>
 					<span>E-Mail</span>
-					<input type="email" name="email" autocomplete="email" placeholder="name@example.com" />
+					<input
+						type="text"
+						name="email"
+						autocomplete="email"
+						value={form?.values?.email ?? ''}
+						placeholder="name@example.com"
+						aria-invalid={form?.errors?.email ? 'true' : undefined}
+					/>
+					{#if form?.errors?.email}
+						<small>{form.errors.email}</small>
+					{/if}
 				</label>
 
 				<label>
 					<span>Passwort</span>
-					<input type="password" name="password" autocomplete="current-password" placeholder="********" />
+					<input
+						type="password"
+						name="password"
+						autocomplete="current-password"
+						placeholder="********"
+						aria-invalid={form?.errors?.password ? 'true' : undefined}
+					/>
+					{#if form?.errors?.password}
+						<small>{form.errors.password}</small>
+					{/if}
 				</label>
 
-				<a class="login-button" href="/trips">Einloggen</a>
+				<button class="login-button" type="submit">Einloggen</button>
 			</form>
 
 			<p class="register-note">
-				Noch kein Konto? <a href="/">Registrieren</a>
+				Noch kein Konto? <a href="/register">Registrieren</a>
 			</p>
 		</div>
 	</section>
@@ -245,6 +269,25 @@
 	input:focus {
 		border-color: #4169be;
 		box-shadow: 0 0 0 4px rgba(138, 175, 255, 0.3);
+	}
+
+	input[aria-invalid='true'] {
+		border-color: #b42318;
+	}
+
+	label small {
+		color: #b42318;
+		font-size: 0.82rem;
+		font-weight: 800;
+	}
+
+	.form-alert {
+		padding: 10px 12px;
+		border: 1px solid rgba(180, 35, 24, 0.22);
+		border-radius: 8px;
+		background: rgba(180, 35, 24, 0.08);
+		color: #b42318;
+		font-weight: 800;
 	}
 
 	a {

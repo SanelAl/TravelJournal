@@ -1,5 +1,7 @@
 <script>
 	import logo from '$lib/assets/Logo.png';
+
+	let { user = null } = $props();
 </script>
 
 <nav class="app-nav" aria-label="Hauptnavigation">
@@ -9,7 +11,7 @@
 	</a>
 
 	<div class="nav-links">
-		<a class="active" href="/trips">Reisen</a>
+		<a class="active" href="/trips">Meine Reisen</a>
 		<a href="/trips">Reise Planen</a>
 		<a href="/trips">Social</a>
 		<a href="/trips">Kalender</a>
@@ -33,7 +35,15 @@
 				</svg>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-end">
-				<li><a class="dropdown-item" href="/">Logout</a></li>
+				{#if user}
+					<li><span class="dropdown-item-text">{user.displayName}</span></li>
+					<li><hr class="dropdown-divider" /></li>
+				{/if}
+				<li>
+					<form method="POST" action="/logout">
+						<button class="dropdown-item" type="submit">Logout</button>
+					</form>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -142,6 +152,11 @@
 
 	.dropdown-item {
 		font-weight: 800;
+	}
+
+	.dropdown-item-text {
+		color: #52617b;
+		font-weight: 900;
 	}
 
 	@media (max-width: 620px) {

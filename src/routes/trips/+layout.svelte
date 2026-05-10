@@ -2,11 +2,11 @@
 	import AppFooter from '$lib/components/AppFooter.svelte';
 	import AppNav from '$lib/components/AppNav.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <div class="app-shell">
-	<AppNav />
+	<AppNav user={data.user} />
 	<main class="app-main">
 		{@render children()}
 	</main>

@@ -1,50 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { deleteImage, uploadImageBuffer } from '$lib/server/cloudinary.js';
 import { getTravelsCollection } from '$lib/server/db.js';
+import { mapTravelToPhotosPage, readString, safePublicId } from '$lib/server/travel-model.js';
 import { ObjectId } from 'mongodb';
 
-function toDate(value) {
-	const date = value instanceof Date ? value : new Date(value);
-	return Number.isNaN(date.getTime()) ? null : date;
+function travelQuery(params, locals) {
+	return { _id: new ObjectId(params.id), userId: locals.user.objectId };
 }
 
-function getYear(value) {
-	const date = toDate(value);
-	return date ? String(date.getUTCFullYear()) : '----';
-}
-
-function mapPhotos(photos = []) {
-	return photos.map((photo, index) => ({
-		id: photo._id?.toString?.() ?? `${index}`,
-		name: photo.name || `Foto ${index + 1}`,
-		url: photo.url || '',
-		publicId: photo.publicId || ''
-	}));
-}
-
-function mapTravelToPhotosPage(travel) {
-	return {
-		id: travel._id.toString(),
-		place: travel.place || 'Unbekannter Ort',
-		year: getYear(travel.startDate),
-		photos: mapPhotos(travel.photos ?? [])
-	};
-}
-
-function readString(formData, key) {
-	return String(formData.get(key) ?? '').trim();
-}
-
-function safePublicId(value) {
-	return value
-		.toLowerCase()
-		.replace(/\.[^.]+$/, '')
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/(^-|-$)/g, '')
-		.slice(0, 48);
-}
-
-export async function load({ params }) {
+export async function load({ locals, params }) {
 	if (!ObjectId.isValid(params.id)) {
 		return {
 			trip: null,
@@ -55,7 +19,7 @@ export async function load({ params }) {
 	try {
 		const collection = await getTravelsCollection();
 		const travel = await collection.findOne(
-			{ _id: new ObjectId(params.id) },
+			travelQuery(params, locals),
 			{ projection: { place: 1, startDate: 1, photos: 1 } }
 		);
 
@@ -81,7 +45,7 @@ export async function load({ params }) {
 }
 
 export const actions = {
-	addPhoto: async ({ params, request }) => {
+	addPhoto: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: { photo: 'Diese Reise-ID ist ungültig.' }
@@ -129,7 +93,7 @@ export const actions = {
 			);
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$push: {
 						photos: { $each: photoDocs }
@@ -155,7 +119,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}/photos`);
 	},
 
-	deletePhoto: async ({ params, request }) => {
+	deletePhoto: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const photoId = readString(formData, 'photoId');
 
@@ -168,7 +132,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const travel = await collection.findOne(
-				{ _id: new ObjectId(params.id), 'photos._id': new ObjectId(photoId) },
+				{ ...travelQuery(params, locals), 'photos._id': new ObjectId(photoId) },
 				{ projection: { 'photos.$': 1 } }
 			);
 			const photo = travel?.photos?.[0];
@@ -184,7 +148,7 @@ export const actions = {
 			}
 
 			await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$pull: {
 						photos: { _id: new ObjectId(photoId) }
@@ -204,7 +168,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}/photos`);
 	},
 
-	deleteSelectedPhotos: async ({ params, request }) => {
+	deleteSelectedPhotos: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const photoIds = formData.getAll('photoIds').map((value) => String(value).trim()).filter(Boolean);
 
@@ -225,7 +189,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const travel = await collection.findOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{ projection: { photos: 1 } }
 			);
 			const photos = (travel?.photos ?? []).filter((photo) =>
@@ -241,7 +205,7 @@ export const actions = {
 			await Promise.all(photos.filter((photo) => photo.publicId).map((photo) => deleteImage(photo.publicId)));
 
 			await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$pull: {
 						photos: { _id: { $in: objectPhotoIds } }

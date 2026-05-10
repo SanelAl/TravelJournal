@@ -1,167 +1,17 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { uploadImageBuffer } from '$lib/server/cloudinary.js';
 import { getTravelsCollection } from '$lib/server/db.js';
+import {
+	EXPENSE_CATEGORY_SET,
+	mapTravelToDetail,
+	parseSwissDate,
+	readString,
+	safePublicId
+} from '$lib/server/travel-model.js';
 import { ObjectId } from 'mongodb';
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-
-const PHOTO_COLORS = [
-	['#8aafff', '#4169be'],
-	['#dbe7ff', '#14213d'],
-	['#f6bd60', '#355070']
-];
-
-const EXPENSE_COLORS = {
-	Transport: '#4169be',
-	Unterkunft: '#7c3aed',
-	Verpflegung: '#f28f3b',
-	Aktivitäten: '#2f9c95',
-	Aktivitäten: '#2f9c95',
-	Sonstiges: '#e56b6f'
-};
-
-const EXPENSE_CATEGORIES = new Set(['Transport', 'Unterkunft', 'Verpflegung', 'Aktivitäten', 'Sonstiges']);
-
-function toDate(value) {
-	const date = value instanceof Date ? value : new Date(value);
-	return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function formatDate(value) {
-	const date = toDate(value);
-
-	if (!date) {
-		return 'Noch nicht erfasst';
-	}
-
-	const day = String(date.getUTCDate()).padStart(2, '0');
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const year = date.getUTCFullYear();
-
-	return `${day}.${month}.${year}`;
-}
-
-function parseSwissDate(value) {
-	const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
-
-	if (!match) {
-		return null;
-	}
-
-	const [, day, month, year] = match;
-	const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
-
-	if (
-		date.getUTCFullYear() !== Number(year) ||
-		date.getUTCMonth() !== Number(month) - 1 ||
-		date.getUTCDate() !== Number(day)
-	) {
-		return null;
-	}
-
-	return date;
-}
-
-function getYear(value) {
-	const date = toDate(value);
-	return date ? String(date.getUTCFullYear()) : '----';
-}
-
-function getDay(value) {
-	const date = toDate(value);
-	return date ? String(date.getUTCDate()).padStart(2, '0') : '--';
-}
-
-function getMonth(value) {
-	const date = toDate(value);
-	return date ? MONTHS[date.getUTCMonth()] : '---';
-}
-
-function mapPhotos(photos = []) {
-	return photos.map((photo, index) => ({
-		id: photo._id?.toString?.() ?? `${index}`,
-		label: photo.name || `Foto ${index + 1}`,
-		date: formatDate(photo.date),
-		url: photo.url || '',
-		colors: PHOTO_COLORS[index % PHOTO_COLORS.length]
-	}));
-}
-
-function mapActivities(activities = []) {
-	return activities
-		.map((activity, index) => ({
-			id: activity._id?.toString?.() ?? `${index}`,
-			date: formatDate(activity.date),
-			day: getDay(activity.date),
-			month: getMonth(activity.date),
-			title: activity.title || 'Aktivität ohne Titel',
-			place: activity.place || 'Ort offen',
-			description: activity.note || 'Keine Notiz erfasst.',
-			rawDate: toDate(activity.date)?.toISOString() ?? ''
-		}))
-		.sort((a, b) => a.rawDate.localeCompare(b.rawDate) || a.title.localeCompare(b.title));
-}
-
-function mapExpenses(expenses = []) {
-	return expenses.map((expense, index) => ({
-		id: expense._id?.toString?.() ?? `${index}`,
-		category: expense.category || 'Sonstiges',
-		amount: Number(expense.amount ?? 0),
-		description: expense.description || expense.note || '',
-		color: EXPENSE_COLORS[expense.category] ?? EXPENSE_COLORS.Sonstiges
-	}));
-}
-
-function mapComments(comments = []) {
-	return comments
-		.map((comment, index) => ({
-			id: comment._id?.toString?.() ?? `${index}`,
-			date: formatDate(comment.date),
-			text: comment.text || comment.note || 'Kein Kommentartext erfasst.',
-			rawDate: toDate(comment.date)?.toISOString() ?? ''
-		}))
-		.sort((a, b) => b.rawDate.localeCompare(a.rawDate));
-}
-
-function getNextActivity(activities) {
-	if (activities.length === 0) {
-		return null;
-	}
-
-	const today = new Date();
-	const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-	const upcoming = activities.find((activity) => {
-		const date = toDate(activity.rawDate);
-		return date && date >= todayUtc;
-	});
-	const activity = upcoming ?? activities[0];
-
-	return `${activity.date} - ${activity.title}`;
-}
-
-function getSchedule(travel, activities) {
-	const startDate = formatDate(travel.startDate);
-	const endDate = formatDate(travel.endDate);
-	const nextActivity = Boolean(travel.isActive) ? getNextActivity(activities) : null;
-
-	return {
-		firstLabel: nextActivity ? 'Nächste Aktivität' : 'Hinreise',
-		firstValue: nextActivity ?? `${startDate} - Hinreise`,
-		returnValue: `${endDate} - Rückreise`
-	};
-}
-
-function readString(formData, key) {
-	return String(formData.get(key) ?? '').trim();
-}
-
-function safePublicId(value) {
-	return value
-		.toLowerCase()
-		.replace(/\.[^.]+$/, '')
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/(^-|-$)/g, '')
-		.slice(0, 48);
+function travelQuery(params, locals) {
+	return { _id: new ObjectId(params.id), userId: locals.user.objectId };
 }
 
 function activityValuesFrom(formData) {
@@ -206,7 +56,7 @@ function validateExpense(values) {
 	const errors = {};
 	const amount = values.amount ? Number(values.amount) : 0;
 
-	if (!EXPENSE_CATEGORIES.has(values.category)) {
+	if (!EXPENSE_CATEGORY_SET.has(values.category)) {
 		errors.expense = 'Bitte Kategorie auswählen.';
 	}
 
@@ -217,28 +67,7 @@ function validateExpense(values) {
 	return { errors, amount };
 }
 
-function mapTravelToDetail(travel) {
-	const activities = mapActivities(travel.activities ?? []);
-
-	return {
-		id: travel._id.toString(),
-		place: travel.place || 'Unbekannter Ort',
-		year: getYear(travel.startDate),
-		continent: travel.continent || 'TravelJournal',
-		isActive: Boolean(travel.isActive),
-		isPublic: Boolean(travel.isPublic),
-		description: travel.shortNote || 'Noch keine Kurznotiz erfasst.',
-		notes: travel.notes || '',
-		budgetTotal: Number(travel.budgetTotal ?? 0),
-		photos: mapPhotos(travel.photos ?? []),
-		expenses: mapExpenses(travel.expenses ?? []),
-		schedule: getSchedule(travel, activities),
-		activities,
-		comments: mapComments(travel.comments ?? [])
-	};
-}
-
-export async function load({ params }) {
+export async function load({ locals, params }) {
 	if (!ObjectId.isValid(params.id)) {
 		return {
 			trip: null,
@@ -248,7 +77,7 @@ export async function load({ params }) {
 
 	try {
 		const collection = await getTravelsCollection();
-		const travel = await collection.findOne({ _id: new ObjectId(params.id) });
+		const travel = await collection.findOne(travelQuery(params, locals));
 
 		if (!travel) {
 			return {
@@ -272,7 +101,7 @@ export async function load({ params }) {
 }
 
 export const actions = {
-	saveNotes: async ({ params, request }) => {
+	saveNotes: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: {
@@ -290,7 +119,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$set: {
 						notes,
@@ -325,7 +154,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	addActivity: async ({ params, request }) => {
+	addActivity: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: { activity: 'Diese Reise-ID ist ungültig.' }
@@ -343,7 +172,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$push: {
 						activities: {
@@ -375,7 +204,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	updateActivity: async ({ params, request }) => {
+	updateActivity: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const values = activityValuesFrom(formData);
 
@@ -394,7 +223,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id), 'activities._id': new ObjectId(values.id) },
+				{ ...travelQuery(params, locals), 'activities._id': new ObjectId(values.id) },
 				{
 					$set: {
 						'activities.$.date': date,
@@ -421,7 +250,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	deleteActivity: async ({ params, request }) => {
+	deleteActivity: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const activityId = readString(formData, 'activityId');
 
@@ -434,7 +263,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$pull: {
 						activities: { _id: new ObjectId(activityId) }
@@ -454,7 +283,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	addExpense: async ({ params, request }) => {
+	addExpense: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: { expense: 'Diese Reise-ID ist ungültig.' }
@@ -472,7 +301,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$push: {
 						expenses: {
@@ -503,7 +332,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	updateExpense: async ({ params, request }) => {
+	updateExpense: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const values = expenseValuesFrom(formData);
 
@@ -522,7 +351,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id), 'expenses._id': new ObjectId(values.id) },
+				{ ...travelQuery(params, locals), 'expenses._id': new ObjectId(values.id) },
 				{
 					$set: {
 						'expenses.$.category': values.category,
@@ -548,7 +377,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	deleteExpense: async ({ params, request }) => {
+	deleteExpense: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const expenseId = readString(formData, 'expenseId');
 
@@ -561,7 +390,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$pull: {
 						expenses: { _id: new ObjectId(expenseId) }
@@ -581,7 +410,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	addComment: async ({ params, request }) => {
+	addComment: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: { comment: 'Diese Reise-ID ist ungültig.' }
@@ -600,7 +429,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$push: {
 						comments: {
@@ -630,7 +459,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	addPhoto: async ({ params, request }) => {
+	addPhoto: async ({ locals, params, request }) => {
 		if (!ObjectId.isValid(params.id)) {
 			return fail(400, {
 				errors: { photo: 'Diese Reise-ID ist ungültig.' }
@@ -678,7 +507,7 @@ export const actions = {
 			);
 			const collection = await getTravelsCollection();
 			const result = await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$push: {
 						photos: { $each: photoDocs }
@@ -704,7 +533,7 @@ export const actions = {
 		throw redirect(303, `/trips/${params.id}`);
 	},
 
-	deleteComment: async ({ params, request }) => {
+	deleteComment: async ({ locals, params, request }) => {
 		const formData = await request.formData();
 		const commentId = readString(formData, 'commentId');
 
@@ -717,7 +546,7 @@ export const actions = {
 		try {
 			const collection = await getTravelsCollection();
 			await collection.updateOne(
-				{ _id: new ObjectId(params.id) },
+				travelQuery(params, locals),
 				{
 					$pull: {
 						comments: { _id: new ObjectId(commentId) }
