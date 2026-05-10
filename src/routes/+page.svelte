@@ -2,7 +2,7 @@
 	<title>TravelJournal | Login</title>
 	<meta
 		name="description"
-		content="TravelJournal ist dein persönliches Reisetagebuch für Orte, Erlebnisse, Fotos, Kommentare und Budgets."
+		content="TravelJournal ist dein persoenliches Reisetagebuch fuer Orte, Erlebnisse, Fotos, Kommentare und Budgets."
 	/>
 </svelte:head>
 
@@ -11,20 +11,18 @@
 
 	const highlights = [
 		{
-			title: 'Reisen überblicken',
-			text: 'Sortiere deine Einträge später nach Datum, Kontinent und Sichtbarkeit.'
+			title: 'Reisen ueberblicken',
+			text: 'Sortiere deine Eintraege spaeter nach Datum, Kontinent und Sichtbarkeit.'
 		},
 		{
 			title: 'Details pflegen',
-			text: 'Aktivitäten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
+			text: 'Aktivitaeten, Fotos, Kommentare, Kosten und Budget kompakt an einem Ort.'
 		},
 		{
 			title: 'Reisen erfassen',
-			text: 'Abgeschlossene Reisen werden Schritt für Schritt dokumentiert.'
+			text: 'Abgeschlossene Reisen werden Schritt fuer Schritt dokumentiert.'
 		}
 	];
-
-	const mockActivities = ['Streetfood Tour', 'Altstadt Spaziergang', 'Museum', 'Sonnenuntergang'];
 </script>
 
 <main class="page-shell container-xxl">
@@ -32,11 +30,11 @@
 		<div class="brand-block">
 			<div class="hero-copy">
 				<img class="hero-logo" src={logo} alt="TravelJournal" />
-				<p class="eyebrow">Persönliches Reisetagebuch</p>
+				<p class="eyebrow">Persoenliches Reisetagebuch</p>
 				<h1 id="page-title">TravelJournal</h1>
 				<p>
-					Sammle Reiseorte, Daten, Aktivitäten, Fotos, Kommentare und Budgets in einer
-					übersichtlichen Web-App mit SvelteKit und MongoDB.
+					Sammle Reiseorte, Daten, Aktivitaeten, Fotos, Kommentare und Budgets in einer
+					uebersichtlichen Web-App mit SvelteKit und MongoDB.
 				</p>
 			</div>
 
@@ -53,7 +51,7 @@
 		<div class="login-panel" aria-labelledby="login-title">
 			<div>
 				<p class="panel-kicker">Einloggen</p>
-				<h2 id="login-title">Willkommen zurück</h2>
+				<h2 id="login-title">Willkommen zurueck</h2>
 			</div>
 
 			<form>
@@ -75,68 +73,15 @@
 			</p>
 		</div>
 	</section>
-
-	<section class="preview-band" aria-label="Vorschau der Reise-Detailseite">
-		<div class="journal-preview">
-			<div class="photo-scene" aria-hidden="true">
-				<div class="sun"></div>
-				<div class="ridge ridge-one"></div>
-				<div class="ridge ridge-two"></div>
-				<div class="water"></div>
-			</div>
-
-			<div class="trip-summary">
-				<div>
-					<p class="panel-kicker">Beispielreise</p>
-					<h2>Kyoto, Japan</h2>
-				</div>
-				<div class="meta-row">
-					<span>12.04.2026</span>
-					<span>9 Tage</span>
-					<span>Asien</span>
-					<span>Privat</span>
-				</div>
-			</div>
-
-			<div class="quadrants" aria-label="Detailseiten-Quadranten">
-				<section>
-					<h3>Aktivitäten</h3>
-					<ul>
-						{#each mockActivities as activity}
-							<li>{activity}</li>
-						{/each}
-					</ul>
-				</section>
-
-				<section>
-					<h3>Fotos</h3>
-					<div class="photo-grid" aria-hidden="true">
-						<span></span>
-						<span></span>
-						<span></span>
-						<span></span>
-					</div>
-				</section>
-
-				<section>
-					<h3>Kommentare</h3>
-					<p>Der Tempelbesuch am Morgen war ruhig, später kam Regen.</p>
-				</section>
-
-				<section>
-					<h3>Budget</h3>
-					<div class="budget-line">
-						<span>CHF 1'640</span>
-						<small>von CHF 2'000</small>
-					</div>
-					<div class="progress"><span></span></div>
-				</section>
-			</div>
-		</div>
-	</section>
 </main>
 
 <style>
+	:global(html),
+	:global(body) {
+		height: 100%;
+		overflow: hidden;
+	}
+
 	:global(body) {
 		margin: 0;
 		font-family:
@@ -150,23 +95,27 @@
 	}
 
 	.page-shell {
-		min-height: 100vh;
+		display: grid;
+		min-height: 100dvh;
 		padding: 24px;
+		place-items: center;
+		overflow: hidden;
 	}
 
 	.hero {
 		display: grid;
-		grid-template-columns: minmax(0, 1.15fr) minmax(320px, 420px);
+		grid-template-columns: minmax(0, 1.12fr) minmax(320px, 420px);
 		gap: 28px;
-		min-height: 620px;
+		width: 100%;
+		max-height: calc(100dvh - 48px);
 		align-items: stretch;
 	}
 
 	.brand-block,
-	.login-panel,
-	.journal-preview {
-		background: rgba(255, 255, 255, 0.78);
+	.login-panel {
 		border: 1px solid rgba(255, 255, 255, 0.86);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.78);
 		box-shadow: 0 24px 70px rgba(51, 87, 158, 0.2);
 		backdrop-filter: blur(18px);
 	}
@@ -174,23 +123,22 @@
 	.brand-block {
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
-		gap: 36px;
+		justify-content: center;
+		gap: 28px;
 		padding: 32px;
-		border-radius: 8px;
 	}
 
 	.hero-copy {
 		max-width: 690px;
-		text-align: center;
 		margin: 0 auto;
+		text-align: center;
 	}
 
 	.hero-logo {
 		display: block;
-		width: min(280px, 72vw);
+		width: min(260px, 58vw);
 		height: auto;
-		margin: 0 auto 28px;
+		margin: 0 auto 22px;
 	}
 
 	.eyebrow,
@@ -205,13 +153,12 @@
 
 	h1,
 	h2,
-	h3,
 	p {
 		margin-top: 0;
 	}
 
 	h1 {
-		margin-bottom: 16px;
+		margin-bottom: 14px;
 		font-size: clamp(2.4rem, 6vw, 4.4rem);
 		line-height: 1;
 		letter-spacing: 0;
@@ -223,8 +170,8 @@
 		margin-bottom: 0;
 		margin-left: auto;
 		color: #33415c;
-		font-size: 1.1rem;
-		line-height: 1.7;
+		font-size: 1.04rem;
+		line-height: 1.55;
 	}
 
 	.feature-grid {
@@ -234,7 +181,7 @@
 	}
 
 	.feature-grid article {
-		min-height: 150px;
+		min-height: 124px;
 		padding: 18px;
 		border: 1px solid rgba(65, 105, 190, 0.16);
 		border-radius: 8px;
@@ -249,8 +196,8 @@
 	.feature-grid p {
 		margin-bottom: 0;
 		color: #52617b;
-		font-size: 0.94rem;
-		line-height: 1.55;
+		font-size: 0.9rem;
+		line-height: 1.45;
 	}
 
 	.login-panel {
@@ -259,7 +206,6 @@
 		justify-content: center;
 		gap: 28px;
 		padding: 34px;
-		border-radius: 8px;
 	}
 
 	.login-panel h2 {
@@ -313,8 +259,8 @@
 
 	.login-button {
 		display: grid;
-		place-items: center;
 		min-height: 50px;
+		place-items: center;
 		border: 0;
 		border-radius: 8px;
 		background: #14213d;
@@ -337,184 +283,14 @@
 		text-align: center;
 	}
 
-	.preview-band {
-		margin: 28px auto 0;
-	}
-
-	.journal-preview {
-		display: grid;
-		grid-template-columns: 0.85fr 1.15fr;
-		gap: 22px;
-		padding: 20px;
-		border-radius: 8px;
-	}
-
-	.photo-scene {
-		position: relative;
-		min-height: 360px;
-		overflow: hidden;
-		border-radius: 8px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0)),
-			linear-gradient(155deg, #ffc857 0%, #f38d68 38%, #4169be 100%);
-	}
-
-	.sun {
-		position: absolute;
-		top: 42px;
-		right: 48px;
-		width: 86px;
-		height: 86px;
-		border-radius: 50%;
-		background: #fff4b7;
-		box-shadow: 0 0 48px rgba(255, 244, 183, 0.8);
-	}
-
-	.ridge,
-	.water {
-		position: absolute;
-		right: 0;
-		left: 0;
-	}
-
-	.ridge-one {
-		bottom: 100px;
-		height: 150px;
-		background: linear-gradient(135deg, transparent 0 18%, #2c476d 18% 52%, transparent 52%),
-			linear-gradient(225deg, transparent 0 24%, #203656 24% 62%, transparent 62%);
-		opacity: 0.86;
-	}
-
-	.ridge-two {
-		bottom: 64px;
-		height: 120px;
-		background: linear-gradient(135deg, transparent 0 24%, #6f8dd8 24% 58%, transparent 58%),
-			linear-gradient(225deg, transparent 0 16%, #4e73d0 16% 55%, transparent 55%);
-		opacity: 0.92;
-	}
-
-	.water {
-		bottom: 0;
-		height: 128px;
-		background:
-			repeating-linear-gradient(
-				180deg,
-				rgba(255, 255, 255, 0.32) 0 2px,
-				rgba(255, 255, 255, 0) 2px 18px
-			),
-			linear-gradient(180deg, #7fb1f9, #385aa8);
-	}
-
-	.trip-summary {
-		display: grid;
-		gap: 14px;
-		align-content: start;
-	}
-
-	.trip-summary h2 {
-		margin-bottom: 0;
-		font-size: 2.2rem;
-	}
-
-	.meta-row {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-
-	.meta-row span {
-		padding: 8px 10px;
-		border: 1px solid rgba(65, 105, 190, 0.16);
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.72);
-		color: #40516d;
-		font-size: 0.86rem;
-		font-weight: 800;
-	}
-
-	.quadrants {
-		display: grid;
-		grid-column: 2;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 12px;
-	}
-
-	.quadrants section {
-		min-height: 148px;
-		padding: 16px;
-		border: 1px solid rgba(65, 105, 190, 0.16);
-		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.72);
-	}
-
-	.quadrants h3 {
-		margin-bottom: 12px;
-		font-size: 1rem;
-	}
-
-	.quadrants ul {
-		display: grid;
-		gap: 8px;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.quadrants li,
-	.quadrants p,
-	.budget-line small {
-		color: #52617b;
-		font-size: 0.92rem;
-		line-height: 1.45;
-	}
-
-	.quadrants p {
-		margin-bottom: 0;
-	}
-
-	.photo-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 8px;
-	}
-
-	.photo-grid span {
-		aspect-ratio: 1.45;
-		border-radius: 6px;
-		background: linear-gradient(135deg, #8aafff, #ffffff 52%, #f5c56b);
-	}
-
-	.budget-line {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 12px;
-		font-weight: 900;
-	}
-
-	.progress {
-		height: 10px;
-		margin-top: 18px;
-		overflow: hidden;
-		border-radius: 999px;
-		background: #d8e3fb;
-	}
-
-	.progress span {
-		display: block;
-		width: 82%;
-		height: 100%;
-		background: #4169be;
-	}
-
 	@media (max-width: 920px) {
 		.page-shell {
 			padding: 16px;
 		}
 
-		.hero,
-		.journal-preview {
+		.hero {
 			grid-template-columns: 1fr;
+			max-height: calc(100dvh - 32px);
 		}
 
 		.brand-block,
@@ -522,13 +298,8 @@
 			padding: 24px;
 		}
 
-		.feature-grid,
-		.quadrants {
+		.feature-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.quadrants {
-			grid-column: auto;
 		}
 	}
 
@@ -538,17 +309,17 @@
 		}
 
 		.brand-block,
-		.login-panel,
-		.journal-preview {
+		.login-panel {
 			padding: 18px;
+		}
+
+		.hero-logo {
+			width: min(210px, 56vw);
+			margin-bottom: 16px;
 		}
 
 		h1 {
 			font-size: 2.55rem;
-		}
-
-		.photo-scene {
-			min-height: 260px;
 		}
 	}
 </style>

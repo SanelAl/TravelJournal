@@ -48,7 +48,7 @@
 		min-height: 72px;
 		padding: 0 28px;
 		border-bottom: 1px solid rgba(65, 105, 190, 0.14);
-		background: rgba(255, 255, 255, 0.78);
+		background: rgba(255, 255, 255, 0.68);
 		backdrop-filter: blur(18px);
 	}
 

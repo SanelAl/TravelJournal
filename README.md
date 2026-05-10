@@ -1,4 +1,4 @@
-# Projektdokumentation - [Projekttitel]
+# Projektdokumentation - TravelJournal
 
 ## Inhaltsverzeichnis
 
